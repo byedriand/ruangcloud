@@ -202,10 +202,10 @@ Sistem mengimplementasikan seluruh kebutuhan fungsional modul **F-01 hingga F-09
 
 ### Langkah Instalasi
 
-#### 1. Clone Repositori & Masuk ke Folder Proyek
+#### 1. Clone Repositori & Masuk ke Direktori Proyek
 ```bash
 git clone https://github.com/byedriand/ruangcloud.git
-cd ruangcloud/ruangcloud
+cd ruangcloud
 ```
 
 #### 2. Pasang Dependensi PHP & JavaScript
@@ -308,38 +308,40 @@ RuangCloud menyediakan perintah Artisan khusus untuk administrasi latar belakang
 
 ## 📁 Struktur Direktori Proyek
 
-Seluruh source code aplikasi dikelompokkan rapi di dalam direktori `ruangcloud/`:
+Proyek ini dibangun menggunakan arsitektur standar framework modern Laravel 12 (PSR-4) yang modular dan terstruktur:
 
 ```text
-byedriand/ruangcloud/ (Root Repository)
-├── ruangcloud/           # Direktori utama kode aplikasi sistem RuangCloud
-│   ├── app/              # Logika inti aplikasi (Controllers, Models, Jobs, Services, CLI Commands)
-│   │   ├── Console/      # Perintah artisan kustom (nodes:check, uploads:cleanup, dev)
-│   │   ├── Http/         # Kontroler web & REST API (Upload, Auth, File, Share, Admin, dll.)
-│   │   ├── Jobs/         # Background queue jobs (AssembleUpload, ReplicateFile)
-│   │   ├── Models/       # Eloquent ORM Models (User, StoredFile, StorageNode, ShareLink, dll.)
-│   │   └── Services/     # Layanan penyimpanan & failover (StorageNodeService)
-│   ├── bootstrap/        # Bootstrapping framework & registrasi provider
-│   ├── config/           # Berkas konfigurasi sistem (config/nodes.php, queue.php, dll.)
-│   ├── database/         # Migrasi skema database, factories, & seeder (RuangCloudSeeder)
-│   ├── docs/             # Dokumentasi riwayat & catatan teknis tahap pengembangan
-│   │   ├── README-TAHAP2.md  # Catatan teknis backend, database, chunk logic, & multi-node
-│   │   └── README-TAHAP3.md  # Catatan teknis integrasi halaman user, share link, & soft delete
-│   ├── public/           # Web server public root (index.php, robots.txt, favicon)
-│   ├── resources/        # Aset kode sumber frontend
-│   │   ├── css/          # Stylesheet Tailwind CSS v4 & custom styles
-│   │   ├── js/           # JavaScript klien (uploader.js, ruangcloud.js)
-│   │   └── views/        # Template antarmuka Laravel Blade (Admin, User, Share, Auth)
-│   ├── routes/           # Definisi rute aplikasi (web.php, console.php)
-│   ├── storage/          # Penyimpanan internal (chunks upload sementara & folder node cluster)
-│   ├── tests/            # Otomasi pengujian sistem (Unit & Feature tests)
-│   ├── .env.example      # Template konfigurasi environment lokal
-│   ├── artisan           # CLI runner Laravel
-│   ├── composer.json     # Definisi dependensi backend PHP
-│   ├── package.json      # Definisi dependensi frontend JavaScript & build tools
-│   └── vite.config.js    # Konfigurasi bundler Vite
-├── .gitignore            # Filter pengabaian git untuk root & subfolder
-└── README.md             # Dokumentasi lengkap proyek sesuai USTEK
+ruangcloud/               # Direktori utama proyek (Repositori GitHub)
+├── app/                  # Logika inti aplikasi (Controllers, Models, Jobs, Services, CLI Commands)
+│   ├── Console/Commands/ # Perintah artisan kustom (nodes:check, uploads:cleanup, dev)
+│   ├── Http/Controllers/ # Kontroler web & REST API (Upload, Auth, File, Share, Admin, dll.)
+│   ├── Jobs/             # Background queue jobs (AssembleUpload, ReplicateFile)
+│   ├── Models/           # Eloquent ORM Models (User, StoredFile, StorageNode, ShareLink, dll.)
+│   └── Services/         # Layanan penyimpanan & failover (StorageNodeService)
+├── bootstrap/            # Bootstrapping framework & registrasi provider
+├── config/               # Berkas konfigurasi sistem (config/nodes.php, queue.php, dll.)
+├── database/             # Migrasi skema database, factories, & seeder (RuangCloudSeeder)
+├── docs/                 # Dokumentasi riwayat & catatan teknis tahap pengembangan
+│   ├── README-TAHAP2.md  # Catatan teknis backend, database, chunk logic, & multi-node
+│   └── README-TAHAP3.md  # Catatan teknis integrasi halaman user, share link, & soft delete
+├── public/               # Web server public root (index.php, robots.txt, favicon)
+├── resources/            # Aset kode sumber frontend
+│   ├── css/              # Stylesheet Tailwind CSS v4 & custom styles
+│   ├── js/               # JavaScript klien (uploader.js, ruangcloud.js)
+│   └── views/            # Template antarmuka Laravel Blade (Admin, User, Share, Auth)
+├── routes/               # Definisi rute aplikasi (web.php, console.php)
+├── storage/              # Penyimpanan internal (chunks upload sementara & folder node cluster)
+├── tests/                # Otomasi pengujian sistem (Unit & Feature tests)
+├── .editorconfig         # Standar format editor
+├── .env.example          # Template konfigurasi environment lokal
+├── .gitattributes        # Atribut Git
+├── .gitignore            # Filter pengabaian git (vendor, node_modules, .env)
+├── artisan               # CLI runner Laravel
+├── composer.json         # Definisi dependensi backend PHP
+├── package.json          # Definisi dependensi frontend JavaScript & build tools
+├── phpunit.xml           # Konfigurasi automated testing
+├── README.md             # Dokumentasi utama proyek sesuai USTEK
+└── vite.config.js        # Konfigurasi bundler Vite
 ```
 
 ---
