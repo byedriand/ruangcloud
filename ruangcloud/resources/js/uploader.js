@@ -214,7 +214,15 @@ async function finish() {
     const { session_id: id } = job.session;
     ui.progress(100);
     ui.meta('Menggabungkan file di server…');
-    await api(`/upload/${id}/complete`, { method: 'POST' });
+    const completeRes = await api(`/upload/${id}/complete`, { method: 'POST' });
+    if (completeRes?.status === 'completed') {
+        ui.status('Selesai');
+        ui.meta('File tersimpan dan sedang direplikasi ke node lain');
+        ui.paused(true);
+        notify('File berhasil diunggah');
+        setTimeout(() => window.location.reload(), 1200);
+        return;
+    }
 
     for (let n = 0; n < 120; n++) {
         await sleep(1500);
@@ -230,7 +238,7 @@ async function finish() {
         }
         if (status.status === 'failed') throw new Error(status.error || 'Gagal menggabungkan file');
     }
-    throw new Error('Server belum selesai memproses. Pastikan "php artisan queue:work" berjalan.');
+    throw new Error('Server belum selesai memproses penggabungan berkas. Silakan coba lagi.');
 }
 
 export function toggleUpload() {

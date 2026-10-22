@@ -6,6 +6,7 @@ use App\Jobs\AssembleUpload;
 use App\Models\Folder;
 use App\Models\StoredFile;
 use App\Models\UploadSession;
+use App\Services\StorageNodeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -74,9 +75,21 @@ class UploadController extends Controller
         ]);
     }
 
-    public function status(Request $request, UploadSession $session): JsonResponse
+    public function status(Request $request, UploadSession $session, StorageNodeService $nodes): JsonResponse
     {
         $this->authorizeSession($request, $session);
+
+        // Fallback pertahanan: Jika sesi masih 'assembling' selama >= 2 detik
+        // (misal antrean queue worker belum berjalan atau terhenti),
+        // proses penggabungan secara sinkron agar pengguna tidak macet di 100%.
+        if ($session->status === 'assembling' && $session->updated_at && $session->updated_at->diffInSeconds(now()) >= 2) {
+            try {
+                (new AssembleUpload($session->id))->handle($nodes);
+                $session->refresh();
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         return response()->json([
             'status'       => $session->status,
@@ -143,7 +156,7 @@ class UploadController extends Controller
         $session->update(['status' => 'assembling']);
         AssembleUpload::dispatch($session->id);
 
-        return response()->json(['status' => 'assembling']);
+        return response()->json(['status' => $session->fresh()->status]);
     }
 
     public function cancel(Request $request, UploadSession $session): JsonResponse

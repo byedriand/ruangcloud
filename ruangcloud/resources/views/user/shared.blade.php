@@ -1,26 +1,53 @@
 <x-user-layout title="Dibagikan" active="shared">
-  <div class="mb-7">
-    <p class="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-[#0aa982]">Ruang kerja saya</p>
-    <h1 class="text-[26px] font-extrabold tracking-[-0.035em] md:text-[30px]">Dibagikan</h1>
-    <p class="mt-1 text-sm text-[#78837f]">Kelola tautan berbagi. Buat tautan baru dari menu titik tiga pada file di File saya.</p>
+  <div class="mb-8">
+    <div class="inline-flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-700">
+      <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+      Ruang kerja saya
+    </div>
+    <h1 class="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">Tautan Dibagikan</h1>
+    <p class="mt-1.5 text-base text-slate-600">Kelola tautan berbagi berkas. Buat tautan baru dari menu titik tiga pada file di halaman File Saya.</p>
   </div>
 
-  <section class="overflow-hidden rounded-[20px] border border-[#e1e8e5] bg-white">
+  <section class="overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-sm">
     @forelse ($shares as $share)
-      <div class="flex flex-wrap items-center gap-3.5 border-b border-[#f0f3f2] px-5 py-4 last:border-0">
-        <div class="file-icon file-{{ $share['color'] }}"><x-icon :name="$share['icon']" class="h-4.5 w-4.5" /></div>
-        <div class="min-w-0 flex-1 basis-56">
-          <p class="flex items-center gap-1.5 truncate text-xs font-bold">{{ $share['file'] }} @if ($share['protected'])<x-icon name="lock" class="h-3.5 w-3.5 text-[#8a9591]" />@endif</p>
-          <p class="mt-0.5 text-[10px] text-[#929c98]">Berlaku sampai: {{ $share['expires'] }} • {{ $share['downloads'] }}× diunduh</p>
+      <div class="flex flex-wrap items-center gap-4 border-b border-slate-100 px-6 py-4.5 last:border-0 hover:bg-slate-50/70 transition-colors">
+        <div class="file-icon file-{{ $share['color'] }} h-11 w-11 rounded-xl">
+          <x-icon :name="$share['icon']" class="h-5 w-5" />
         </div>
-        <span class="rounded-full px-2.5 py-1 text-[9px] font-extrabold {{ $share['active'] ? 'bg-[#e9faf5] text-[#098b6c]' : 'bg-[#f0f2f1] text-[#7d8985]' }}">{{ $share['status'] }}</span>
+        <div class="min-w-0 flex-1 basis-64">
+          <p class="flex items-center gap-2 truncate text-sm font-bold text-slate-900">
+            {{ $share['file'] }}
+            @if ($share['protected'])
+              <span class="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">
+                <x-icon name="lock" class="h-3 w-3" /> Dilindungi sandi
+              </span>
+            @endif
+          </p>
+          <p class="mt-1 text-xs text-slate-500">Berlaku sampai: <span class="font-medium text-slate-700">{{ $share['expires'] }}</span> • Diunduh <span class="font-semibold text-slate-700">{{ $share['downloads'] }}×</span></p>
+        </div>
+        <span class="rounded-full px-3 py-1 text-xs font-bold {{ $share['active'] ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">
+          {{ $share['status'] }}
+        </span>
         @if ($share['active'])
-          <button type="button" data-action="copy-link" data-url="{{ $share['url'] }}" class="flex h-9 items-center gap-1.5 rounded-xl border border-[#dce5e1] px-3 text-[11px] font-bold text-[#44514d] hover:border-[#bfcfc9]"><x-icon name="copy" class="h-3.5 w-3.5" /> Salin tautan</button>
-          <button type="button" data-action="revoke-share" data-share-id="{{ $share['id'] }}" class="h-9 rounded-xl border border-[#f0d3d1] px-3 text-[11px] font-bold text-[#d94f4f] hover:bg-[#fff1f0]">Cabut</button>
+          <button type="button" data-action="copy-link" data-url="{{ $share['url'] }}" class="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition">
+            <x-icon name="copy" class="h-4 w-4" /> Salin tautan
+          </button>
+          <button type="button" data-action="revoke-share" data-share-id="{{ $share['id'] }}" class="h-10 rounded-xl border border-rose-200 bg-white px-3.5 text-xs font-bold text-rose-600 hover:bg-rose-50 transition">
+            Cabut akses
+          </button>
         @endif
       </div>
     @empty
-      <div class="px-6 py-14 text-center"><div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eff7f4] text-[#0aa982]"><x-icon name="link" class="h-6 w-6" /></div><p class="text-sm font-extrabold">Belum ada tautan berbagi</p><p class="mt-1 text-xs text-[#87928e]">Buka File saya, klik titik tiga pada file, lalu pilih Bagikan.</p><a href="{{ route('files.index') }}" class="mt-4 inline-block rounded-xl bg-[#0cb48c] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#09a47f]">Buka File saya</a></div>
+      <div class="flex flex-col items-center px-6 py-16 text-center">
+        <div class="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+          <x-icon name="link" class="h-7 w-7" />
+        </div>
+        <p class="text-base font-extrabold text-slate-900">Belum ada tautan berbagi aktif</p>
+        <p class="mt-1 text-sm text-slate-500">Buka menu File Saya, klik ikon titik tiga pada file, lalu pilih Bagikan.</p>
+        <a href="{{ route('files.index') }}" class="mt-5 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-500 transition">
+          Buka File Saya
+        </a>
+      </div>
     @endforelse
   </section>
 </x-user-layout>
