@@ -28,8 +28,9 @@
 9. [Panduan Instalasi & Menjalankan](#-panduan-instalasi--menjalankan)
 10. [Akun Demo Pengujian](#-akun-demo-pengujian)
 11. [Perintah Khusus Pemeliharaan (CLI)](#-perintah-khusus-pemeliharaan-cli)
-12. [Rencana Pengujian & Kriteria Kelulusan](#-rencana-pengujian--kriteria-kelulusan)
-13. [Dasar Hukum & Standar Teknis](#-dasar-hukum--standar-teknis)
+12. [Struktur Direktori Proyek](#-struktur-direktori-proyek)
+13. [Rencana Pengujian & Kriteria Kelulusan](#-rencana-pengujian--kriteria-kelulusan)
+14. [Dasar Hukum & Standar Teknis](#-dasar-hukum--standar-teknis)
 
 ---
 
@@ -302,6 +303,41 @@ RuangCloud menyediakan perintah Artisan khusus untuk administrasi latar belakang
    *Menghapus potongan chunk dan sesi upload yang telah terbengkalai melewati masa toleransi 24 jam untuk mencegah pemborosan ruang penyimpanan.*
 
 *(Dapat dijadwalkan otomatis melalui scheduler Laravel `php artisan schedule:work`)*.
+
+---
+
+## 📁 Struktur Direktori Proyek
+
+Proyek ini dibangun menggunakan arsitektur standar framework modern Laravel 12 (PSR-4) yang modular dan terstruktur:
+
+```text
+ruangcloud/
+├── app/                  # Logika inti aplikasi (Controllers, Models, Jobs, Services, CLI Commands)
+│   ├── Console/Commands/ # Perintah artisan kustom (nodes:check, uploads:cleanup, dev)
+│   ├── Http/Controllers/ # Kontroler web & REST API (Upload, Auth, File, Share, Admin, dll.)
+│   ├── Jobs/             # Background queue jobs (AssembleUpload, ReplicateFile)
+│   ├── Models/           # Eloquent ORM Models (User, StoredFile, StorageNode, ShareLink, dll.)
+│   └── Services/         # Layanan penyimpanan & failover (StorageNodeService)
+├── bootstrap/            # Bootstrapping framework & registrasi provider
+├── config/               # Berkas konfigurasi sistem (config/nodes.php, queue.php, dll.)
+├── database/             # Migrasi skema database, factories, & seeder (RuangCloudSeeder)
+├── docs/                 # Dokumentasi riwayat & catatan teknis tahap pengembangan
+│   ├── README-TAHAP2.md  # Catatan teknis backend, database, chunk logic, & multi-node
+│   └── README-TAHAP3.md  # Catatan teknis integrasi halaman user, share link, & soft delete
+├── public/               # Web server public root (index.php, robots.txt, favicon)
+├── resources/            # Aset kode sumber frontend
+│   ├── css/              # Stylesheet Tailwind CSS v4 & custom styles
+│   ├── js/               # JavaScript klien (uploader.js, ruangcloud.js)
+│   └── views/            # Template antarmuka Laravel Blade (Admin, User, Share, Auth)
+├── routes/               # Definisi rute aplikasi (web.php, console.php)
+├── storage/              # Penyimpanan internal (chunks upload sementara & folder node cluster)
+├── tests/                # Otomasi pengujian sistem (Unit & Feature tests)
+├── .env.example          # Template konfigurasi environment lokal
+├── artisan               # CLI runner Laravel
+├── composer.json         # Definisi dependensi backend PHP
+├── package.json          # Definisi dependensi frontend JavaScript & build tools
+└── vite.config.js        # Konfigurasi bundler Vite
+```
 
 ---
 
