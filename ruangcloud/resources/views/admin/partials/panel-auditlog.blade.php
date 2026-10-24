@@ -2,7 +2,7 @@
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
   <div>
     <h2 class="text-2xl font-extrabold tracking-[-0.035em]">Audit Log</h2>
-    <p class="mt-1 text-sm text-[#64748b]">Rekam jejak semua aktivitas pengguna di sistem.</p>
+    <p class="mt-1 text-sm text-[#64748b]">Rekam jejak 10 aktivitas terakhir pengguna di sistem.</p>
   </div>
   <div class="flex items-center gap-2">
     <div class="relative">
@@ -27,17 +27,6 @@
   @endforeach
 </div>
 
-{{-- Filter by Action --}}
-<div class="mb-4 flex flex-wrap gap-2">
-  <button onclick="filterAuditAction('all')" class="audit-filter active rounded-xl px-3.5 py-2 text-xs font-bold bg-[#0cb48c] text-white transition-colors" data-action-filter="all">
-    Semua
-  </button>
-  @foreach (['upload','login','download','delete','share','restore','folder','replicate'] as $act)
-    <button onclick="filterAuditAction('{{ $act }}')" class="audit-filter rounded-xl px-3.5 py-2 text-xs font-semibold bg-[#f0f4f2] text-[#5e6d68] hover:bg-[#e8edeb] transition-colors" data-action-filter="{{ $act }}">
-      {{ ucfirst($act) }}
-    </button>
-  @endforeach
-</div>
 
 {{-- Log Table --}}
 <article class="overflow-hidden rounded-[20px] border border-[#e0e8e5] bg-white shadow-xs">
@@ -71,7 +60,7 @@
           <tr class="audit-row hover:bg-[#fafcfb] transition-colors"
               data-desc="{{ strtolower($log->description) }}" data-action-type="{{ $log->action }}"
               data-user="{{ strtolower($log->user?->name ?? '') }}">
-            <td class="px-5 py-3.5 text-xs font-semibold text-[#8d9793]">{{ $auditLogs->firstItem() + $i }}</td>
+            <td class="px-5 py-3.5 text-xs font-semibold text-[#8d9793]">{{ $i + 1 }}</td>
             <td class="px-5 py-3.5">
               <div class="flex items-center gap-2.5">
                 <div class="flex h-8 w-8 items-center justify-center rounded-full bg-[#edf1ef] text-xs font-bold text-[#475569]">
@@ -110,26 +99,12 @@
     </table>
   </div>
 
-  {{-- Pagination --}}
-  @if ($auditLogs->hasPages())
-    <div class="flex items-center justify-between border-t border-[#edf1ef] px-5 py-3.5">
-      <p class="text-xs font-medium text-[#64748b]">
-        Menampilkan {{ $auditLogs->firstItem() }}–{{ $auditLogs->lastItem() }} dari {{ $auditLogs->total() }} entri
-      </p>
-      <div class="flex gap-1">
-        @if ($auditLogs->onFirstPage())
-          <span class="rounded-lg px-3.5 py-1.5 text-xs text-[#b0bab6]">← Sebelumnya</span>
-        @else
-          <a href="{{ $auditLogs->previousPageUrl() }}" class="rounded-lg border border-[#e2e9e6] px-3.5 py-1.5 text-xs font-semibold hover:border-[#0cb48c] transition-colors">← Sebelumnya</a>
-        @endif
-        @if ($auditLogs->hasMorePages())
-          <a href="{{ $auditLogs->nextPageUrl() }}" class="rounded-lg border border-[#e2e9e6] px-3.5 py-1.5 text-xs font-semibold hover:border-[#0cb48c] transition-colors">Berikutnya →</a>
-        @else
-          <span class="rounded-lg px-3.5 py-1.5 text-xs text-[#b0bab6]">Berikutnya →</span>
-        @endif
-      </div>
-    </div>
-  @endif
+  {{-- Info: hanya 10 aktivitas terakhir --}}
+  <div class="flex items-center justify-between border-t border-[#edf1ef] px-5 py-3.5">
+    <p class="text-xs font-medium text-[#64748b]">
+      Menampilkan {{ $auditLogs->count() }} aktivitas terakhir
+    </p>
+  </div>
 </article>
 
 <script>

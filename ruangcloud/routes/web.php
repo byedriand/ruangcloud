@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/files', [FileController::class, 'index'])->name('files.index');
         Route::get('/recent', [FileController::class, 'recent'])->name('files.recent');
+        Route::get('/downloads', [FileController::class, 'downloads'])->name('files.downloads');
         Route::get('/shared', [ShareController::class, 'index'])->name('shares.index');
         Route::get('/activity', [ActivityController::class, 'index'])->name('activity.index');
         Route::get('/trash', [TrashController::class, 'index'])->name('trash.index');

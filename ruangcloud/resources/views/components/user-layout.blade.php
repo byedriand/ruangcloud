@@ -99,29 +99,12 @@
   </div>
 
   {{-- Kartu Progres Unggahan (diisi uploader.js) --}}
-  <div id="upload-card" hidden class="fixed bottom-6 right-6 z-30 w-[350px] overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xl shadow-slate-900/15 sm:right-8">
-    <div class="flex items-center gap-3.5">
-      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-        <x-icon name="upload" class="h-5 w-5" />
-      </div>
-      <div class="min-w-0 flex-1">
-        <div class="flex items-center justify-between">
-          <p id="up-name" class="truncate text-sm font-bold text-slate-900">-</p>
-          <span id="up-status" class="text-xs font-extrabold text-emerald-600">0%</span>
-        </div>
-        <div class="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
-          <div id="up-bar" class="upload-progress h-full rounded-full bg-emerald-500" style="width: 0%"></div>
-        </div>
-        <p id="up-meta" class="mt-1.5 text-xs text-slate-500"></p>
-      </div>
-      <button type="button" id="up-toggle" data-action="toggle-upload" aria-label="Jeda unggahan" class="rounded-xl p-2 text-slate-500 hover:bg-slate-100">
-        <span id="icon-pause"><x-icon name="pause" class="h-4.5 w-4.5" /></span>
-        <span id="icon-resume" hidden><x-icon name="upload" class="h-4.5 w-4.5" /></span>
-      </button>
-      <button type="button" data-action="cancel-upload" aria-label="Batalkan unggahan" class="rounded-xl p-2 text-slate-500 hover:bg-slate-100">
-        <x-icon name="x" class="h-4.5 w-4.5" />
-      </button>
+  <div id="upload-card" hidden class="fixed bottom-6 right-6 z-30 w-[360px] overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-2xl shadow-slate-900/15 sm:right-8">
+    <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+      <p class="text-sm font-extrabold text-slate-900">Unggahan</p>
+      <span id="upload-count" class="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-extrabold text-emerald-700"></span>
     </div>
+    <div id="upload-items" class="max-h-[300px] divide-y divide-slate-100 overflow-y-auto"></div>
   </div>
 
   {{-- Modal Upload --}}
@@ -138,7 +121,7 @@
       </div>
 
       <label id="drop-zone" class="flex cursor-pointer flex-col items-center rounded-2xl border-2 border-dashed border-emerald-300 bg-emerald-50/40 px-6 py-10 text-center transition hover:border-emerald-500 hover:bg-emerald-50/70">
-        <input id="upload-input" type="file" class="hidden">
+        <input id="upload-input" type="file" multiple class="hidden">
         <div class="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
           <x-icon name="upload" class="h-7 w-7" />
         </div>

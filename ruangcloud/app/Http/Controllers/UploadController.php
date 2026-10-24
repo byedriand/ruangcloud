@@ -46,6 +46,12 @@ class UploadController extends Controller
             ->first();
         $resumed = (bool) $session;
 
+        if ($session) {
+            // Sesi lama yang dilanjutkan: segarkan masa berlakunya dari sekarang,
+            // agar tidak kedaluwarsa di tengah unggahan yang sedang dilanjutkan.
+            $session->update(['expires_at' => now()->addHours((int) config('nodes.session_ttl_hours'))]);
+        }
+
         if (! $session) {
             $used = (int) StoredFile::withTrashed()->where('user_id', $user->id)->sum('size');
             if ($used + $data['size'] > $user->quota_bytes) {
@@ -130,7 +136,14 @@ class UploadController extends Controller
         Storage::disk('local')->putFileAs($session->chunkDir(), $file, UploadSession::chunkName($index));
 
         $count = count($this->received($session));
-        $session->update(['received_count' => $count, 'last_chunk_at' => now()]);
+        $session->update([
+            'received_count' => $count,
+            'last_chunk_at'  => now(),
+            // Sliding expiry: masa berlaku sesi diperpanjang setiap chunk diterima,
+            // jadi unggahan aktif tidak akan kedaluwarsa di tengah jalan. Sesi hanya
+            // kedaluwarsa bila benar-benar ditinggal selama session_ttl_hours.
+            'expires_at'     => now()->addHours((int) config('nodes.session_ttl_hours')),
+        ]);
 
         return response()->json(['received_count' => $count, 'total_chunks' => $session->total_chunks]);
     }

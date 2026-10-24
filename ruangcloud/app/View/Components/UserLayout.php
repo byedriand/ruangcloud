@@ -41,6 +41,7 @@ class UserLayout extends Component
             ['key' => 'files',    'label' => 'File saya', 'icon' => 'folder',   'route' => 'files.index',    'badge' => null],
             ['key' => 'shared',   'label' => 'Dibagikan', 'icon' => 'users',    'route' => 'shares.index',   'badge' => $activeShares ?: null],
             ['key' => 'recent',   'label' => 'Terbaru',   'icon' => 'clock',    'route' => 'files.recent',   'badge' => null],
+            ['key' => 'downloads', 'label' => 'Download', 'icon' => 'download', 'route' => 'files.downloads', 'badge' => null],
             ['key' => 'activity', 'label' => 'Aktivitas', 'icon' => 'activity', 'route' => 'activity.index', 'badge' => null],
             ['key' => 'trash',    'label' => 'Sampah',    'icon' => 'trash',    'route' => 'trash.index',    'badge' => $trashed ?: null],
         ];

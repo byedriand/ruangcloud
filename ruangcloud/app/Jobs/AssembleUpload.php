@@ -8,6 +8,7 @@ use App\Models\StoredFile;
 use App\Models\UploadSession;
 use App\Models\User;
 use App\Services\StorageNodeService;
+use App\Support\UniqueName;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
@@ -81,10 +82,20 @@ class AssembleUpload implements ShouldQueue
             }
 
             $file = DB::transaction(function () use ($session, $targets, $primary, $checksum, $storedPath) {
+                // Nama sama di folder yang sama -> beri penanda " (1)", " (2)", dst.
+                $uniqueName = UniqueName::resolve(
+                    $session->file_name,
+                    fn (string $candidate) => StoredFile::withoutTrashed()
+                        ->where('user_id', $session->user_id)
+                        ->where('folder_id', $session->folder_id)
+                        ->where('name', $candidate)
+                        ->exists()
+                );
+
                 $file = StoredFile::create([
                     'user_id'         => $session->user_id,
                     'folder_id'       => $session->folder_id,
-                    'name'            => $session->file_name,
+                    'name'            => $uniqueName,
                     'mime'            => $session->mime,
                     'size'            => $session->file_size,
                     'checksum_sha256' => $checksum,

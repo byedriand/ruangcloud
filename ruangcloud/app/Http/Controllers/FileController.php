@@ -7,6 +7,7 @@ use App\Models\Folder;
 use App\Models\StoredFile;
 use App\Services\StorageNodeService;
 use App\Support\Fmt;
+use App\Support\UniqueName;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -67,6 +68,27 @@ class FileController extends Controller
         return view('user.recent', compact('rows'));
     }
 
+    /** Download: semua file pengguna dari seluruh folder, siap diunduh. */
+    public function downloads(Request $request)
+    {
+        $files = StoredFile::where('user_id', $request->user()->id)
+            ->with('folder')
+            ->latest()->get();
+
+        $rows = $files->map(function (StoredFile $f) {
+            $row = Fmt::fileRow($f);
+            $row['folderName'] = $f->folder?->name ?? 'File saya';
+            $row['sizeRaw'] = (int) $f->size;
+
+            return $row;
+        })->all();
+
+        $totalFiles = $files->count();
+        $totalSize  = Fmt::bytes((int) $files->sum('size'));
+
+        return view('user.downloads', compact('rows', 'totalFiles', 'totalSize'));
+    }
+
     public function download(Request $request, StoredFile $file, StorageNodeService $nodes)
     {
         $this->authorizeFile($request, $file);
@@ -124,6 +146,17 @@ class FileController extends Controller
             }
         }
 
+        // Nama tujuan sudah dipakai file lain di folder yang sama -> beri penanda " (1)", dst.
+        $rawName = UniqueName::resolve(
+            $rawName,
+            fn (string $candidate) => StoredFile::withoutTrashed()
+                ->where('user_id', $file->user_id)
+                ->where('folder_id', $file->folder_id)
+                ->where('name', $candidate)
+                ->whereKeyNot($file->id)
+                ->exists()
+        );
+
         $file->update(['name' => $rawName]);
 
         ActivityLog::record(
@@ -148,9 +181,20 @@ class FileController extends Controller
             }
         }
 
-        $file->update(['folder_id' => $folderId]);
+        // Di folder tujuan sudah ada file bernama sama -> beri penanda " (1)", dst.
+        $name = UniqueName::resolve(
+            $file->name,
+            fn (string $candidate) => StoredFile::withoutTrashed()
+                ->where('user_id', $file->user_id)
+                ->where('folder_id', $folderId)
+                ->where('name', $candidate)
+                ->whereKeyNot($file->id)
+                ->exists()
+        );
 
-        return response()->json(['ok' => true]);
+        $file->update(['folder_id' => $folderId, 'name' => $name]);
+
+        return response()->json(['ok' => true, 'name' => $name]);
     }
 
     /** Hapus = pindah ke Sampah (soft delete). Penghapusan permanen ada di TrashController. */

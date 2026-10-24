@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use App\Models\Folder;
+use App\Support\UniqueName;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -25,7 +26,16 @@ class FolderController extends Controller
             }
         }
 
-        $folder = Folder::create(['user_id' => $request->user()->id, 'parent_id' => $parentId, 'name' => trim($data['name'])]);
+        // Nama folder sama di induk yang sama -> beri penanda " (1)", " (2)", dst.
+        $name = UniqueName::resolve(
+            trim($data['name']),
+            fn (string $candidate) => Folder::where('user_id', $request->user()->id)
+                ->where('parent_id', $parentId)
+                ->where('name', $candidate)
+                ->exists()
+        );
+
+        $folder = Folder::create(['user_id' => $request->user()->id, 'parent_id' => $parentId, 'name' => $name]);
 
         ActivityLog::record('folder', Str::before($request->user()->name, ' ') . ' membuat folder "' . $folder->name . '"');
 
@@ -37,9 +47,18 @@ class FolderController extends Controller
         abort_unless($folder->user_id === $request->user()->id, 403);
         $data = $request->validate(['name' => ['required', 'string', 'max:100']]);
 
-        $folder->update(['name' => trim($data['name'])]);
+        $name = UniqueName::resolve(
+            trim($data['name']),
+            fn (string $candidate) => Folder::where('user_id', $request->user()->id)
+                ->where('parent_id', $folder->parent_id)
+                ->where('name', $candidate)
+                ->whereKeyNot($folder->id)
+                ->exists()
+        );
 
-        return response()->json(['ok' => true]);
+        $folder->update(['name' => $name]);
+
+        return response()->json(['ok' => true, 'name' => $name]);
     }
 
     /** Folder hanya bisa dihapus bila kosong. */

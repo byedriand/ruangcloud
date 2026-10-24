@@ -128,9 +128,11 @@ class AdminController extends Controller
             ->get();
 
         /* ─── AUDIT LOG ──────────────────────────────────────────────── */
+        // Hanya 10 aktivitas terakhir yang ditampilkan (tanpa pagination).
         $auditLogs = ActivityLog::with('user')
             ->latest()
-            ->paginate(25);
+            ->take(10)
+            ->get();
 
         $auditStats = collect(['upload', 'login', 'download', 'delete', 'share'])
             ->map(fn ($act) => [

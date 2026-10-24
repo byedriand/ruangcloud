@@ -22,7 +22,11 @@ return new class extends Migration
             $table->string('status', 20)->default('uploading'); // uploading | assembling | completed | failed | cancelled | expired
             $table->text('error')->nullable();
             $table->foreignId('file_id')->nullable()->constrained()->nullOnDelete();
-            $table->timestamp('expires_at');
+            // WAJIB dateTime, BUKAN timestamp: di MariaDB (XAMPP) kolom TIMESTAMP NOT NULL
+            // pertama tanpa default eksplisit diam-diam mendapat ON UPDATE CURRENT_TIMESTAMP,
+            // sehingga expires_at tertimpa jam sekarang setiap baris di-update (per chunk)
+            // dan sesi dianggap kedaluwarsa pada chunk berikutnya.
+            $table->dateTime('expires_at');
             $table->timestamp('last_chunk_at')->nullable();
             $table->timestamps();
 

@@ -32,8 +32,10 @@ class RuangCloudSeeder extends Seeder
             ])->save();
         }
 
-        // 3 storage node. Di pengembangan = 3 folder lokal; di server nyata arahkan ke mount/server berbeda.
-        foreach ([['jakarta', 'Jakarta'], ['bandung', 'Bandung'], ['surabaya', 'Surabaya']] as [$code, $name]) {
+        // 3 storage node, ditampilkan generik sebagai Server 1/2/3. Code & path internal tetap
+        // (jakarta/bandung/surabaya) agar file replika yang sudah tersimpan tidak yatim.
+        // Di pengembangan = 3 folder lokal; di server nyata arahkan ke mount/server berbeda.
+        foreach ([['jakarta', 'Server 1'], ['bandung', 'Server 2'], ['surabaya', 'Server 3']] as [$code, $name]) {
             StorageNode::updateOrCreate(['code' => $code], [
                 'name'           => $name,
                 'path'           => storage_path('app/nodes/' . $code),

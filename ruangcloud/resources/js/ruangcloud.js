@@ -1,7 +1,8 @@
 // Interaksi RuangCloud (versi vanilla JS dari state React di prototipe Figma).
 // Semua elemen interaktif memakai atribut data-action / id, tanpa library tambahan.
 
-import { api, startUpload, toggleUpload, cancelUpload } from './uploader';
+import { api, startUpload, toggleUpload, cancelUpload, restoreUploads } from './uploader';
+import { Downloads } from './downloader';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -408,8 +409,19 @@ document.addEventListener('click', (event) => {
             break;
         case 'set-view':      fileView = target.dataset.view; renderFiles(); break;
         case 'add-folder':    addFolder(target.dataset.parentId); break;
-        case 'toggle-upload': toggleUpload(); break;
-        case 'cancel-upload': cancelUpload(); break;
+        case 'toggle-upload': toggleUpload(target.dataset.cid); break;
+        case 'download-file':
+            Downloads.start({
+                id: Number(target.dataset.fileId),
+                name: target.dataset.name,
+                size: Number(target.dataset.size || 0),
+                mime: target.dataset.mime || '',
+                url: target.dataset.url,
+            });
+            break;
+        case 'dl-toggle': Downloads.toggle(target.dataset.id); break;
+        case 'dl-cancel': Downloads.cancel(target.dataset.id); break;
+        case 'cancel-upload': cancelUpload(target.dataset.cid); break;
         case 'delete-file':   trashFile(target.dataset.fileId); break;
         case 'rename-file':
             renameFile(
@@ -517,3 +529,6 @@ function setRole(role) {
 }
 
 renderFiles();
+
+// Pulihkan unggahan yang masih berjalan/terjeda dari halaman sebelumnya (bila ada).
+restoreUploads();
