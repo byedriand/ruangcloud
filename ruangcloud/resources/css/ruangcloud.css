@@ -293,3 +293,22 @@ html {
     animation-iteration-count: 1 !important;
   }
 }
+/* â”€â”€ Tema kaca (glassmorphism) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.glass-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.85), rgba(236, 253, 245, 0.55) 55%, rgba(240, 253, 250, 0.68));
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 16px 36px -16px rgba(6, 40, 30, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+/* â”€â”€ Polesan ikon & aksen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.folder-icon, .file-icon { box-shadow: inset 0 1px 0 rgba(255,255,255,.65), 0 8px 16px -8px rgba(6,40,30,.28); }
+.folder-mint     { color: #07805f; background: linear-gradient(135deg, #dbf8ee, #a7ecd4); }
+.folder-lavender { color: #5f4cc9; background: linear-gradient(135deg, #efeaff, #cfc2fb); }
+.folder-amber    { color: #b26a12; background: linear-gradient(135deg, #fff3d6, #ffd88f); }
+.folder-blue     { color: #2f66b3; background: linear-gradient(135deg, #e3efff, #b3d2f7); }
+.file-red    { color: #d64545; background: linear-gradient(135deg, #ffe9e7, #ffc9c2); }
+.file-orange { color: #cf7218; background: linear-gradient(135deg, #ffedd8, #ffd3a1); }
+.file-purple { color: #6a4fd0; background: linear-gradient(135deg, #efeaff, #d2c6fa); }
+.file-green  { color: #0d9468; background: linear-gradient(135deg, #dcf7ec, #a9ecd2); }
+.file-blue   { color: #2f66b3; background: linear-gradient(135deg, #e3efff, #b3d2f7); }

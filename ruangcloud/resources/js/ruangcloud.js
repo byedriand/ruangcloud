@@ -20,6 +20,92 @@ function notify(message, duration = 2400) {
 
 window.notify = notify;
 
+/* ---------- Popup khusus bertema RuangCloud ---------- */
+let dialogResolve = null;
+
+function ensureDialog() {
+    if ($('#rc-dialog')) return;
+    const wrap = document.createElement('div');
+    wrap.id = 'rc-dialog';
+    wrap.hidden = true;
+    wrap.className = 'fixed inset-0 z-[90] flex items-center justify-center bg-[#052e22]/55 p-4 backdrop-blur-sm';
+    wrap.innerHTML = `
+      <div data-dialog-card class="w-full max-w-sm scale-95 rounded-[26px] glass-card p-6 opacity-0 shadow-2xl transition-all duration-200">
+        <div class="flex flex-col items-center text-center">
+          <div data-dialog-icon class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-lg"></div>
+          <h3 data-dialog-title class="text-lg font-extrabold tracking-tight text-slate-900"></h3>
+          <p data-dialog-message class="mt-1.5 text-sm leading-relaxed text-slate-600"></p>
+        </div>
+        <div data-dialog-input-wrap class="mt-5" hidden>
+          <label data-dialog-label class="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500"></label>
+          <input data-dialog-input type="text" class="w-full rounded-xl border border-white/60 bg-white/70 px-3.5 py-2.5 text-sm font-semibold text-slate-800 shadow-inner outline-none backdrop-blur transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-500/15" />
+        </div>
+        <div class="mt-6 flex gap-3">
+          <button type="button" data-dialog-cancel class="h-11 flex-1 rounded-xl border border-white/60 bg-white/60 text-sm font-bold text-slate-600 shadow-sm backdrop-blur transition hover:bg-white/85">Batal</button>
+          <button type="button" data-dialog-ok class="h-11 flex-1 rounded-xl text-sm font-bold text-white shadow-lg transition active:scale-[0.98]"></button>
+        </div>
+      </div>`;
+    document.body.appendChild(wrap);
+
+    const close = (value) => {
+        $('[data-dialog-card]', wrap).classList.add('scale-95', 'opacity-0');
+        setTimeout(() => { wrap.hidden = true; document.body.classList.remove('overflow-hidden'); }, 150);
+        if (dialogResolve) { dialogResolve(value); dialogResolve = null; }
+    };
+    wrap._close = close;
+
+    $('[data-dialog-cancel]', wrap).addEventListener('click', () => close(null));
+    wrap.addEventListener('click', (e) => { if (e.target === wrap) close(null); });
+    document.addEventListener('keydown', (e) => {
+        if (wrap.hidden) return;
+        if (e.key === 'Escape') close(null);
+        if (e.key === 'Enter' && document.activeElement === $('[data-dialog-input]', wrap)) {
+            e.preventDefault();
+            $('[data-dialog-ok]', wrap).click();
+        }
+    });
+}
+
+const ICON_INFO = '<svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+const ICON_TRASH = '<svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>';
+const ICON_PENCIL = '<svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+
+function openDialog({ title, message, label = null, value = '', okText = 'Oke', danger = false }) {
+    ensureDialog();
+    const wrap = $('#rc-dialog');
+    const icon = $('[data-dialog-icon]', wrap);
+    icon.className = 'mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-lg ' + (danger
+        ? 'bg-gradient-to-br from-rose-400 to-red-500 shadow-rose-500/30'
+        : 'bg-gradient-to-br from-emerald-400 to-teal-500 shadow-emerald-500/30');
+    icon.innerHTML = danger ? ICON_TRASH : (label !== null ? ICON_PENCIL : ICON_INFO);
+    $('[data-dialog-title]', wrap).textContent = title;
+    $('[data-dialog-message]', wrap).textContent = message;
+    const inputWrap = $('[data-dialog-input-wrap]', wrap);
+    const input = $('[data-dialog-input]', wrap);
+    inputWrap.hidden = label === null;
+    if (label !== null) {
+        $('[data-dialog-label]', wrap).textContent = label;
+        input.value = value;
+    }
+    const ok = $('[data-dialog-ok]', wrap);
+    ok.textContent = okText;
+    ok.className = 'h-11 flex-1 rounded-xl text-sm font-bold text-white shadow-lg transition active:scale-[0.98] ' + (danger
+        ? 'bg-gradient-to-r from-rose-500 to-red-500 shadow-rose-600/25 hover:from-rose-400 hover:to-red-400'
+        : 'bg-gradient-to-r from-emerald-500 to-teal-500 shadow-emerald-600/25 hover:from-emerald-400 hover:to-teal-400');
+    ok.onclick = () => wrap._close(label === null ? true : input.value);
+
+    wrap.hidden = false;
+    document.body.classList.add('overflow-hidden');
+    requestAnimationFrame(() => $('[data-dialog-card]', wrap).classList.remove('scale-95', 'opacity-0'));
+    if (label !== null) setTimeout(() => { input.focus(); input.select(); }, 60);
+
+    return new Promise((resolve) => { dialogResolve = resolve; });
+}
+
+const confirmDialog = (opts) => openDialog(opts).then((v) => v === true);
+const promptDialog = (opts) => openDialog(opts);
+
+
 /* ---------- Sidebar (mobile) ---------- */
 function setSidebar(open) {
     const sidebar = $('#sidebar');
@@ -204,8 +290,8 @@ async function run(request, message, redirect = null) {
     }
 }
 
-function addFolder(parentId) {
-    const name = window.prompt('Nama folder baru:');
+async function addFolder(parentId) {
+    const name = await promptDialog({ title: 'Folder baru', message: 'Buat folder untuk mengorganisasi file Anda.', label: 'Nama folder baru', okText: 'Buat folder' });
     if (!name || !name.trim()) return;
     run(
         () => api('/folders', { method: 'POST', json: { name: name.trim(), parent_id: parentId ? Number(parentId) : null } }),
@@ -213,19 +299,19 @@ function addFolder(parentId) {
     );
 }
 
-function renameFolder(id, current) {
-    const name = window.prompt('Nama folder:', current);
+async function renameFolder(id, current) {
+    const name = await promptDialog({ title: 'Ubah nama folder', message: 'Nama baru tampil di semua tempat folder ini muncul.', label: 'Nama folder', value: current, okText: 'Simpan' });
     if (!name || !name.trim() || name.trim() === current) return;
     run(() => api(`/folders/${id}`, { method: 'PATCH', json: { name: name.trim() } }), 'Nama folder diubah');
 }
 
-function deleteFolder(id, redirect) {
-    if (!window.confirm('Hapus folder ini? Folder hanya bisa dihapus bila kosong.')) return;
+async function deleteFolder(id, redirect) {
+    if (!await confirmDialog({ title: 'Hapus folder ini?', message: 'Folder hanya bisa dihapus bila kosong.', okText: 'Hapus', danger: true })) return;
     run(() => api(`/folders/${id}`, { method: 'DELETE' }), 'Folder dihapus', redirect);
 }
 
 let renameFileState = null;
-function renameFile(id, name, baseName = '', extension = '', type = '') {
+async function renameFile(id, name, baseName = '', extension = '', type = '') {
     const ext = extension || (name && name.includes('.') ? name.split('.').pop() : '');
     const base = baseName || (ext && name && name.toLowerCase().endsWith('.' + ext.toLowerCase()) ? name.slice(0, -(ext.length + 1)) : name);
 
@@ -233,7 +319,7 @@ function renameFile(id, name, baseName = '', extension = '', type = '') {
 
     const modal = $('#rename-modal');
     if (!modal) {
-        let input = window.prompt(`Nama file baru (${type || 'file'}):`, base || name);
+        let input = await promptDialog({ title: 'Ubah nama file', message: 'Ekstensi file ditambahkan otomatis bila belum ada.', label: `Nama file baru (${type || 'file'})`, value: base || name, okText: 'Simpan' });
         if (!input || !input.trim()) return;
         input = input.trim();
         if (ext && !input.toLowerCase().endsWith('.' + ext.toLowerCase())) {
@@ -290,8 +376,8 @@ function confirmRenameFile() {
 window.confirmRenameFile = confirmRenameFile;
 
 
-function trashFile(id) {
-    if (!window.confirm('Pindahkan file ini ke sampah?')) return;
+async function trashFile(id) {
+    if (!await confirmDialog({ title: 'Pindahkan ke sampah?', message: 'File ini dipindahkan ke tempat sampah dan masih bisa dipulihkan.', okText: 'Pindahkan' })) return;
     run(() => api(`/files/${id}`, { method: 'DELETE' }), 'File dipindahkan ke sampah');
 }
 
@@ -340,54 +426,77 @@ async function copyText(text) {
         await navigator.clipboard.writeText(text);
         notify('Tautan disalin');
     } catch {
-        window.prompt('Salin tautan ini:', text);
+        await promptDialog({ title: 'Salin tautan', message: 'Salin tautan di bawah ini secara manual.', label: 'Tautan berbagi', value: text, okText: 'Selesai' });
     }
 }
 
-function revokeShare(id) {
-    if (!window.confirm('Cabut tautan ini? Orang yang memegang tautan tidak bisa lagi mengunduh.')) return;
+async function revokeShare(id) {
+    if (!await confirmDialog({ title: 'Cabut tautan berbagi?', message: 'Orang yang memegang tautan tidak bisa lagi mengunduh file ini.', okText: 'Cabut akses', danger: true })) return;
     run(() => api(`/shares/${id}`, { method: 'DELETE' }), 'Tautan dicabut');
+}
+
+async function deleteShare(id) {
+    if (!await confirmDialog({ title: 'Hapus tautan dari daftar?', message: 'Tautan tidak akan bisa dibuka lagi dan catatan ini hilang permanen.', okText: 'Hapus', danger: true })) return;
+    run(() => api(`/shares/${id}/purge`, { method: 'DELETE' }), 'Tautan berbagi dihapus');
 }
 
 function restoreFile(id) {
     run(() => api(`/trash/${id}/restore`, { method: 'POST' }), 'File dipulihkan');
 }
 
-function purgeFile(id) {
-    if (!window.confirm('Hapus file ini secara permanen? Tindakan ini tidak bisa dibatalkan.')) return;
+async function purgeFile(id) {
+    if (!await confirmDialog({ title: 'Hapus file permanen?', message: 'File ini dihapus selamanya dan tidak bisa dikembalikan.', okText: 'Hapus permanen', danger: true })) return;
     run(() => api(`/trash/${id}`, { method: 'DELETE' }), 'File dihapus permanen');
 }
 
-function emptyTrash() {
-    if (!window.confirm('Kosongkan sampah? Semua file di dalamnya dihapus permanen.')) return;
+async function emptyTrash() {
+    if (!await confirmDialog({ title: 'Kosongkan sampah?', message: 'Semua file di dalam sampah akan dihapus permanen.', okText: 'Kosongkan', danger: true })) return;
     run(() => api('/trash', { method: 'DELETE' }), 'Sampah dikosongkan');
 }
 
 /* ---------- Menu titik tiga pada file ---------- */
-const closeMenus = () => $$('details.menu[open]').forEach((menu) => (menu.open = false));
+const closeMenus = () => $$('[data-menu-panel]').forEach((panel) => (panel.hidden = true));
 
-// Panel menu memakai position:fixed agar tidak terpotong tabel yang bisa di-scroll.
-document.addEventListener('toggle', (event) => {
-    const menu = event.target;
-    if (!(menu instanceof HTMLDetailsElement) || !menu.classList.contains('menu') || !menu.open) return;
+function toggleMenu(button) {
+    // Cari panel — bisa sudah dipindah ke body (setelah portal pertama kali)
+    let panel = button._menuPanel;
+    if (!panel) {
+        const wrap = button.closest('.menu');
+        panel = wrap ? $('[data-menu-panel]', wrap) : null;
+    }
+    if (!panel) return;
 
-    $$('details.menu[open]').forEach((other) => {
-        if (other !== menu) other.open = false;
+    const willOpen = panel.hidden;
+    closeMenus();
+    if (!willOpen) return;
+
+    // Portal: pindahkan panel ke body agar terbebas dari overflow/stacking context
+    if (panel.parentElement !== document.body) {
+        document.body.appendChild(panel);
+        button._menuPanel = panel;
+    }
+
+    // Tampilkan tapi tak terlihat dulu agar browser hitung offsetHeight
+    panel.style.visibility = 'hidden';
+    panel.hidden = false;
+
+    requestAnimationFrame(() => {
+        const r = button.getBoundingClientRect();
+        const w = 224;
+        const h = panel.offsetHeight;
+        panel.style.width  = w + 'px';
+        panel.style.left   = Math.max(8, Math.min(r.right - w, window.innerWidth - w - 8)) + 'px';
+        const below = r.bottom + 4;
+        panel.style.top    = (below + h > window.innerHeight - 8 ? Math.max(8, r.top - h - 4) : below) + 'px';
+        panel.style.visibility = '';
     });
-
-    const rect = $('summary', menu).getBoundingClientRect();
-    const panel = $('[data-menu-panel]', menu);
-    const width = 200;
-    panel.style.width = `${width}px`;
-    panel.style.left = `${Math.max(8, Math.min(rect.right - width, window.innerWidth - width - 8))}px`;
-    const below = rect.bottom + 4;
-    panel.style.top = `${below + panel.offsetHeight > window.innerHeight - 8 ? Math.max(8, rect.top - panel.offsetHeight - 4) : below}px`;
-}, true);
+}
 
 document.addEventListener('click', (event) => {
-    if (!event.target.closest('details.menu') || event.target.closest('[data-action]')) closeMenus();
+    const menuButton = event.target.closest('[data-menu-btn]');
+    if (menuButton) { toggleMenu(menuButton); return; }
+    if (!event.target.closest('[data-menu-panel]')) closeMenus();
 });
-window.addEventListener('scroll', closeMenus, true);
 window.addEventListener('resize', closeMenus);
 
 /* ---------- Event delegation ---------- */
@@ -442,6 +551,7 @@ document.addEventListener('click', (event) => {
         case 'copy-share':    copyText($('#share-url').value); break;
         case 'copy-link':     copyText(target.dataset.url); break;
         case 'revoke-share':  revokeShare(target.dataset.shareId); break;
+        case 'delete-share':  deleteShare(target.dataset.shareId); break;
         case 'restore-file':  restoreFile(target.dataset.fileId); break;
         case 'purge-file':    purgeFile(target.dataset.fileId); break;
         case 'empty-trash':   emptyTrash(); break;
@@ -490,10 +600,10 @@ document.addEventListener('input', (event) => {
 
 document.addEventListener('change', (event) => {
     if (event.target.id === 'upload-input') {
-        const file = event.target.files[0];
+        const files = [...(event.target.files || [])];
         event.target.value = '';
         setUploadModal(false);
-        if (file) startUpload(file);
+        files.forEach((file) => startUpload(file));
     }
 });
 
@@ -504,9 +614,9 @@ document.addEventListener('dragover', (event) => {
 document.addEventListener('drop', (event) => {
     if (!event.target.closest?.('#drop-zone')) return;
     event.preventDefault();
-    const file = event.dataTransfer?.files?.[0];
+    const files = [...(event.dataTransfer?.files || [])];
     setUploadModal(false);
-    if (file) startUpload(file);
+    files.forEach((file) => startUpload(file));
 });
 
 /* ---------- Halaman login: pilih peran ---------- */
@@ -516,15 +626,17 @@ function setRole(role) {
     const admin = role === 'admin';
 
     $('#role-input').value = role;
-    $('#email').value = admin ? 'admin@ruangcloud.id' : 'naufal@ruangcloud.id';
     $('#submit-label').textContent = admin ? 'Administrator' : 'Pengguna';
 
     $$('[data-role]').forEach((button) => {
         const on = button.dataset.role === role;
-        button.classList.toggle('bg-white', on);
-        button.classList.toggle('text-[#098568]', on);
-        button.classList.toggle('shadow-sm', on);
-        button.classList.toggle('text-[#75817d]', !on);
+        button.classList.toggle('bg-gradient-to-r', on);
+        button.classList.toggle('from-emerald-500', on);
+        button.classList.toggle('to-teal-400', on);
+        button.classList.toggle('text-white', on);
+        button.classList.toggle('shadow-lg', on);
+        button.classList.toggle('shadow-emerald-500/30', on);
+        button.classList.toggle('text-slate-500', !on);
     });
 }
 

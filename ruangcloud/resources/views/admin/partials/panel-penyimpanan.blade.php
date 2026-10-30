@@ -5,13 +5,13 @@
     <p class="mt-1 text-sm text-slate-500">Pantau kapasitas cluster node penyimpanan dan distribusi file.</p>
   </div>
   <button type="button" data-action="toast" data-message="Laporan penyimpanan sedang disiapkan"
-          class="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4.5 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50">
+          class="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white/70 backdrop-blur-md px-4.5 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50">
     <x-icon name="download" class="h-4 w-4 text-emerald-600" /> Ekspor Laporan
   </button>
 </div>
 
 {{-- Overall Usage --}}
-<div class="mb-6 rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm">
+<div class="mb-6 rounded-3xl glass-card p-6 shadow-sm">
   <div class="mb-5 flex items-center justify-between">
     <div>
       <h3 class="text-base font-extrabold text-slate-900">Kapasitas Keseluruhan Cluster</h3>
@@ -37,9 +37,9 @@
 {{-- Node Cards --}}
 <div class="mb-6 grid gap-5 md:grid-cols-3">
   @foreach ($allNodesDetail as $node)
-    <article class="rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm transition hover:shadow-md">
+    <article class="rounded-3xl glass-card p-6 shadow-sm transition hover:shadow-md">
       <div class="mb-4 flex items-center justify-between">
-        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/30">
           <x-icon name="archive" class="h-6 w-6" />
         </div>
         <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold {{ $node['status'] === 'active' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
@@ -56,7 +56,7 @@
           <span class="font-bold text-slate-800">{{ $node['usedFmt'] }} / {{ $node['capacityFmt'] }}</span>
         </div>
         <div class="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
-          <div class="h-full rounded-full transition-all duration-500 {{ $node['usagePercent'] > 80 ? 'bg-amber-500' : 'bg-emerald-500' }}"
+          <div class="h-full rounded-full transition-all duration-500 {{ $node['usagePercent'] > 80 ? 'bg-gradient-to-r from-amber-500 to-orange-400' : 'bg-gradient-to-r from-emerald-500 to-teal-400' }}"
                style="width: {{ max(4, $node['usagePercent']) }}%"></div>
         </div>
         <div class="flex justify-between text-xs text-slate-500">
@@ -80,7 +80,7 @@
 </div>
 
 {{-- File Distribution --}}
-<article class="overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-sm">
+<article class="overflow-hidden rounded-3xl glass-card shadow-sm">
   <div class="border-b border-slate-100 px-6 py-4.5">
     <h3 class="text-base font-extrabold text-slate-900">Berkas File Terbesar</h3>
     <p class="mt-0.5 text-xs text-slate-500">10 file dengan kapasitas terbesar yang tersimpan di sistem</p>
@@ -88,7 +88,7 @@
   <div class="overflow-x-auto">
     <table class="w-full min-w-[650px]">
       <thead>
-        <tr class="border-b border-slate-100 bg-slate-50/70 text-xs font-bold uppercase tracking-wider text-slate-500">
+        <tr class="border-b border-white/50 bg-gradient-to-r from-emerald-100/50 via-white/30 to-teal-100/40 text-xs font-bold uppercase tracking-wider text-slate-500">
           <th class="px-6 py-3.5 text-left">Nama File</th>
           <th class="px-6 py-3.5 text-left">Pemilik</th>
           <th class="px-6 py-3.5 text-left">Ukuran</th>
@@ -101,10 +101,10 @@
           <tr class="border-t border-slate-100 hover:bg-slate-50/70 transition-colors">
             <td class="px-6 py-3.5">
               <div class="flex items-center gap-3">
-                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/30">
                   <x-icon name="file" class="h-4.5 w-4.5" />
                 </div>
-                <span class="max-w-[240px] truncate text-sm font-bold text-slate-900">{{ $file->name }}</span>
+                <span class="max-w-[240px] truncate text-sm font-bold text-slate-900">{{ \App\Support\Fmt::meta($file->name, $file->mime)[0] }}</span>
               </div>
             </td>
             <td class="px-6 py-3.5 text-xs text-slate-600">{{ $file->user?->name ?? '—' }}</td>

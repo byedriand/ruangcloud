@@ -8,7 +8,7 @@
     <p class="mt-1.5 text-base text-slate-600">Kelola tautan berbagi berkas. Buat tautan baru dari menu titik tiga pada file di halaman File Saya.</p>
   </div>
 
-  <section class="overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-sm">
+  <section class="overflow-hidden rounded-3xl glass-card shadow-sm">
     @forelse ($shares as $share)
       <div class="flex flex-wrap items-center gap-4 border-b border-slate-100 px-6 py-4.5 last:border-0 hover:bg-slate-50/70 transition-colors">
         <div class="file-icon file-{{ $share['color'] }} h-11 w-11 rounded-xl">
@@ -28,18 +28,21 @@
         <span class="rounded-full px-3 py-1 text-xs font-bold {{ $share['active'] ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">
           {{ $share['status'] }}
         </span>
+        <button type="button" data-action="delete-share" data-share-id="{{ $share['id'] }}" title="Hapus dari daftar" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-rose-200 bg-white/70 backdrop-blur-md text-rose-600 hover:bg-rose-50 transition">
+          <x-icon name="trash" class="h-4 w-4" />
+        </button>
         @if ($share['active'])
-          <button type="button" data-action="copy-link" data-url="{{ $share['url'] }}" class="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition">
+          <button type="button" data-action="copy-link" data-url="{{ $share['url'] }}" class="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white/70 backdrop-blur-md px-3.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition">
             <x-icon name="copy" class="h-4 w-4" /> Salin tautan
           </button>
-          <button type="button" data-action="revoke-share" data-share-id="{{ $share['id'] }}" class="h-10 rounded-xl border border-rose-200 bg-white px-3.5 text-xs font-bold text-rose-600 hover:bg-rose-50 transition">
+          <button type="button" data-action="revoke-share" data-share-id="{{ $share['id'] }}" class="h-10 rounded-xl border border-rose-200 bg-white/70 backdrop-blur-md px-3.5 text-xs font-bold text-rose-600 hover:bg-rose-50 transition">
             Cabut akses
           </button>
         @endif
       </div>
     @empty
       <div class="flex flex-col items-center px-6 py-16 text-center">
-        <div class="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+        <div class="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-400 to-purple-500 text-white shadow-lg shadow-violet-500/30">
           <x-icon name="link" class="h-7 w-7" />
         </div>
         <p class="text-base font-extrabold text-slate-900">Belum ada tautan berbagi aktif</p>

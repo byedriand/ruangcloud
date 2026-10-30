@@ -1,9 +1,9 @@
 @php
     $avatarTone = [
-        'mint'     => 'bg-[#dff6ef] text-[#087d62]',
-        'lavender' => 'bg-[#ece8ff] text-[#6e5ec2]',
-        'amber'    => 'bg-[#fff0d9] text-[#b1711a]',
-        'blue'     => 'bg-[#e7f0ff] text-[#4777bc]',
+        'mint'     => 'bg-gradient-to-br from-[#c9f5e6] to-[#8fe3c5] text-[#087d62] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]',
+        'lavender' => 'bg-gradient-to-br from-[#e2dbff] to-[#bdb0f5] text-[#5a4bb0] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]',
+        'amber'    => 'bg-gradient-to-br from-[#ffe9c2] to-[#ffd08a] text-[#9a5f10] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]',
+        'blue'     => 'bg-gradient-to-br from-[#d6e6ff] to-[#a8c8f5] text-[#35619f] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]',
     ];
 @endphp
 
@@ -13,7 +13,7 @@
     <p class="mt-1 text-sm text-slate-500">Pantau performa RuangCloud, kapasitas storage node, dan aktivitas pengguna.</p>
   </div>
   <button type="button" data-action="toast" data-message="Laporan sistem sedang disiapkan"
-          class="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4.5 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50">
+          class="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white/70 backdrop-blur-md px-4.5 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50">
     <x-icon name="download" class="h-4 w-4 text-emerald-600" /> Unduh laporan
   </button>
 </div>
@@ -21,7 +21,7 @@
 {{-- Stat Cards --}}
 <section class="mb-6 grid grid-cols-2 gap-4 xl:grid-cols-4">
   @foreach ($stats as $stat)
-    <article class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm transition hover:shadow-md">
+    <article class="rounded-2xl glass-card p-5 shadow-sm transition hover:shadow-md">
       <div class="mb-4 flex items-center justify-between">
         <div class="folder-icon folder-{{ $stat['tone'] }} h-11 w-11 rounded-xl flex items-center justify-center">
           <x-icon :name="$stat['icon']" class="h-5 w-5" />
@@ -37,7 +37,7 @@
 
 {{-- Charts Row --}}
 <section class="mb-6 grid gap-5 xl:grid-cols-[1.55fr_1fr]">
-  <article class="rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm">
+  <article class="rounded-3xl glass-card p-6 shadow-sm">
     <div class="mb-6 flex items-start justify-between">
       <div>
         <h3 class="text-base font-extrabold text-slate-900">Aktivitas Unggahan</h3>
@@ -48,7 +48,7 @@
     <div class="flex h-48 items-end gap-3 border-b border-slate-100 pt-5">
       @foreach ($chartValues as $i => $value)
         <div class="group relative flex h-full flex-1 items-end">
-          <div class="w-full rounded-t-lg bg-emerald-100 transition-all group-hover:bg-emerald-500" style="height: {{ max(6, $value) }}%">
+          <div class="w-full rounded-t-lg bg-gradient-to-t from-emerald-500/60 via-emerald-400/70 to-teal-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] transition-all group-hover:from-emerald-500 group-hover:via-emerald-400 group-hover:to-teal-300" style="height: {{ max(6, $value) }}%">
             <span class="absolute -top-6 left-1/2 hidden -translate-x-1/2 rounded bg-slate-900 px-2 py-0.5 text-xs font-bold text-white group-hover:block">{{ $chartTips[$i] }}</span>
           </div>
         </div>
@@ -59,7 +59,7 @@
     </div>
   </article>
 
-  <article class="rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm">
+  <article class="rounded-3xl glass-card p-6 shadow-sm">
     <div class="mb-5 flex items-center justify-between">
       <div>
         <h3 class="text-base font-extrabold text-slate-900">Storage Node</h3>
@@ -69,9 +69,9 @@
     </div>
     <div class="space-y-3.5">
       @foreach ($nodes as $node)
-        <div class="rounded-2xl border border-slate-100 bg-slate-50/60 p-3.5">
+        <div class="rounded-2xl border border-white/50 bg-white/45 p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-sm">
           <div class="flex items-center gap-3.5">
-            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/30">
               <x-icon name="archive" class="h-5 w-5" />
             </div>
             <div class="flex-1 min-w-0">
@@ -80,10 +80,10 @@
                 <span class="font-medium text-slate-500">{{ $node['size'] }}</span>
               </div>
               <div class="mt-2 h-2 rounded-full bg-slate-200">
-                <div class="h-full rounded-full bg-emerald-500 transition-all duration-500" style="width: {{ max(4, $node['usage']) }}%"></div>
+                <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500" style="width: {{ max(4, $node['usage']) }}%"></div>
               </div>
             </div>
-            <span class="h-2.5 w-2.5 rounded-full {{ $node['status'] === 'active' ? 'bg-emerald-500' : 'bg-rose-500' }}"></span>
+            <span class="h-2.5 w-2.5 rounded-full {{ $node['status'] === 'active' ? 'bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.18)]' : 'bg-rose-500 shadow-[0_0_0_4px_rgba(244,63,94,0.18)]' }}"></span>
           </div>
         </div>
       @endforeach
@@ -93,7 +93,7 @@
 
 {{-- Bottom Row --}}
 <section class="grid gap-5 xl:grid-cols-[1.5fr_1fr]">
-  <article class="overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-sm">
+  <article class="overflow-hidden rounded-3xl glass-card shadow-sm">
     <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4.5">
       <div>
         <h3 class="text-base font-extrabold text-slate-900">Pengguna Terbaru</h3>
@@ -103,11 +103,11 @@
               class="text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:underline">Lihat semua</button>
     </div>
     <div class="overflow-x-auto"><div class="min-w-[600px]">
-      <div class="grid grid-cols-[1.4fr_1fr_110px_40px] gap-3 bg-slate-50/70 px-6 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">
+      <div class="grid grid-cols-[1.4fr_1fr_110px_40px] gap-3 bg-gradient-to-r from-emerald-100/50 via-white/30 to-teal-100/40 px-6 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">
         <span>Pengguna</span><span>Kuota</span><span>Status</span><span></span>
       </div>
       @foreach ($users as $user)
-        <div class="grid grid-cols-[1.4fr_1fr_110px_40px] items-center gap-3 border-t border-slate-100 px-6 py-3.5 hover:bg-slate-50/70 transition-colors">
+        <div class="grid grid-cols-[1.4fr_1fr_110px_40px] items-center gap-3 border-t border-slate-100 px-6 py-3.5 hover:bg-emerald-50/60 transition-colors">
           <div class="flex items-center gap-3">
             <div class="flex h-9 w-9 items-center justify-center rounded-xl text-xs font-extrabold {{ $avatarTone[$user['tone']] }}">{{ $user['initials'] }}</div>
             <div class="min-w-0">
@@ -130,7 +130,7 @@
     </div></div>
   </article>
 
-  <article class="rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm">
+  <article class="rounded-3xl glass-card p-6 shadow-sm">
     <div class="mb-5 flex items-center justify-between">
       <div>
         <h3 class="text-base font-extrabold text-slate-900">Aktivitas Terbaru</h3>
@@ -143,7 +143,7 @@
     <div class="space-y-4">
       @forelse ($activities as $activity)
         <div class="flex items-center gap-3.5">
-          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+          <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/30">
             <x-icon :name="$activity['icon']" class="h-4 w-4" />
           </div>
           <div class="min-w-0 flex-1">

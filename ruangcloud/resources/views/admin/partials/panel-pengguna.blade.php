@@ -1,10 +1,10 @@
 {{-- Panel Pengguna --}}
 @php
     $avatarTone = [
-        'mint'     => 'bg-[#dff6ef] text-[#087d62]',
-        'lavender' => 'bg-[#ece8ff] text-[#6e5ec2]',
-        'amber'    => 'bg-[#fff0d9] text-[#b1711a]',
-        'blue'     => 'bg-[#e7f0ff] text-[#4777bc]',
+        'mint'     => 'bg-gradient-to-br from-[#c9f5e6] to-[#8fe3c5] text-[#087d62] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]',
+        'lavender' => 'bg-gradient-to-br from-[#e2dbff] to-[#bdb0f5] text-[#5a4bb0] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]',
+        'amber'    => 'bg-gradient-to-br from-[#ffe9c2] to-[#ffd08a] text-[#9a5f10] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]',
+        'blue'     => 'bg-gradient-to-br from-[#d6e6ff] to-[#a8c8f5] text-[#35619f] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]',
     ];
     $tones = ['mint', 'lavender', 'amber', 'blue'];
 @endphp
@@ -17,11 +17,11 @@
   <div class="flex items-center gap-3">
     <div class="relative">
       <x-icon name="search" class="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-slate-400" />
-      <input id="user-search" class="h-10 w-64 rounded-xl border border-slate-200 bg-white pl-10 pr-3.5 text-xs font-medium outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+      <input id="user-search" class="h-10 w-64 rounded-xl border border-slate-200 bg-white/70 backdrop-blur-md pl-10 pr-3.5 text-xs font-medium outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
              placeholder="Cari pengguna..." oninput="filterUsers(this.value)">
     </div>
     <button type="button" onclick="openAddAdmin()"
-            class="flex h-10 items-center gap-2 rounded-xl bg-emerald-600 px-4 text-xs font-bold text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-500 transition-colors">
+            class="flex h-10 items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 text-xs font-bold text-white shadow-md shadow-emerald-600/25 transition-all hover:from-emerald-400 hover:to-teal-400">
       <x-icon name="plus" class="h-4 w-4" /> Tambah Admin
     </button>
   </div>
@@ -29,25 +29,25 @@
 
 {{-- Stats Mini --}}
 <div class="mb-6 grid grid-cols-3 gap-4">
-  <div class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm">
-    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Pengguna</p>
+  <div class="rounded-2xl glass-card p-5 shadow-sm">
+    <div class="flex items-center gap-3"><div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/30"><x-icon name="users" class="h-5 w-5" /></div><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Pengguna</p></div>
     <p class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">{{ $allUsers->count() }}</p>
     <p class="mt-1 text-xs text-slate-500">+{{ $newUsersThisMonth }} bulan ini</p>
   </div>
-  <div class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm">
-    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Pengguna Aktif</p>
+  <div class="rounded-2xl glass-card p-5 shadow-sm">
+    <div class="flex items-center gap-3"><div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 to-cyan-500 text-white shadow-lg shadow-teal-500/30"><x-icon name="check" class="h-5 w-5" /></div><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Pengguna Aktif</p></div>
     <p class="mt-2 text-3xl font-extrabold tracking-tight text-emerald-600">{{ $allUsers->where('is_active', true)->count() }}</p>
     <p class="mt-1 text-xs text-slate-500">{{ $allUsers->where('is_active', false)->count() }} nonaktif</p>
   </div>
-  <div class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm">
-    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Administrator</p>
+  <div class="rounded-2xl glass-card p-5 shadow-sm">
+    <div class="flex items-center gap-3"><div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-400 to-purple-500 text-white shadow-lg shadow-violet-500/30"><x-icon name="lock" class="h-5 w-5" /></div><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Administrator</p></div>
     <p class="mt-2 text-3xl font-extrabold tracking-tight text-purple-600">{{ $allUsers->where('role', 'admin')->count() }}</p>
     <p class="mt-1 text-xs text-slate-500">{{ $allUsers->where('role', 'user')->count() }} pengguna biasa</p>
   </div>
 </div>
 
 {{-- Table --}}
-<article class="overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-sm">
+<article class="overflow-hidden rounded-3xl glass-card shadow-sm">
   <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4.5">
     <div>
       <h3 class="text-base font-extrabold text-slate-900">Daftar Pengguna</h3>
@@ -64,7 +64,7 @@
   <div class="overflow-x-auto">
     <table class="w-full min-w-[750px]" id="users-table">
       <thead>
-        <tr class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50/70 border-b border-slate-100">
+        <tr class="text-xs font-bold uppercase tracking-wider text-slate-500 bg-gradient-to-r from-emerald-100/50 via-white/30 to-teal-100/40 border-b border-white/50">
           <th class="px-6 py-3.5 text-left">Pengguna</th>
           <th class="px-6 py-3.5 text-left">Peran</th>
           <th class="px-6 py-3.5 text-left">Kuota Terpakai</th>
@@ -81,7 +81,7 @@
             $used = (int) \App\Models\StoredFile::withTrashed()->where('user_id', $user->id)->sum('size');
             $percent = $user->quota_bytes > 0 ? (int) min(100, round($used / $user->quota_bytes * 100)) : 0;
           @endphp
-          <tr class="user-row border-t border-slate-100 hover:bg-slate-50/70 transition-colors" data-name="{{ strtolower($user->name) }}" data-email="{{ strtolower($user->email) }}" data-role="{{ $user->role }}">
+          <tr class="user-row border-t border-slate-100 hover:bg-emerald-50/60 transition-colors" data-name="{{ strtolower($user->name) }}" data-email="{{ strtolower($user->email) }}" data-role="{{ $user->role }}">
             <td class="px-6 py-3.5">
               <div class="flex items-center gap-3">
                 <div class="flex h-10 w-10 items-center justify-center rounded-xl text-xs font-extrabold {{ $avatarTone[$tone] }}">{{ $initials }}</div>
@@ -102,7 +102,7 @@
                 <span class="text-slate-400">{{ \App\Support\Fmt::bytes($user->quota_bytes) }}</span>
               </div>
               <div class="h-2 w-36 rounded-full bg-slate-100">
-                <div class="h-full rounded-full {{ $percent > 75 ? 'bg-amber-500' : 'bg-emerald-500' }}" style="width: {{ max(4, $percent) }}%"></div>
+                <div class="h-full rounded-full {{ $percent > 75 ? 'bg-gradient-to-r from-amber-500 to-orange-400' : 'bg-gradient-to-r from-emerald-500 to-teal-400' }}" style="width: {{ max(4, $percent) }}%"></div>
               </div>
             </td>
             <td class="px-6 py-3.5">
@@ -114,11 +114,11 @@
               {{ $user->created_at->locale('id')->translatedFormat('j M Y') }}
             </td>
             <td class="px-6 py-3.5 relative">
-              <details class="menu relative inline-block">
-                <summary class="cursor-pointer list-none rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 [&::-webkit-details-marker]:hidden">
+              <div class="menu relative inline-block">
+                <button type="button" data-admin-menu-btn aria-label="Menu pengguna" class="cursor-pointer rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">
                   <x-icon name="more" class="h-4.5 w-4.5" />
-                </summary>
-                <div data-menu-panel class="fixed z-50 rounded-2xl border border-slate-200/90 bg-white p-1.5 text-xs font-semibold text-slate-700 shadow-xl shadow-slate-900/10 w-48">
+                </button>
+                <div data-admin-menu-panel hidden class="fixed z-50 w-48 rounded-2xl glass-card p-1.5 text-left text-xs font-semibold text-slate-700 shadow-xl shadow-slate-900/10">
                   <button type="button" onclick="updateAdminUser({{ $user->id }}, 'toggle_active')" 
                           class="flex w-full items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-left hover:bg-slate-50"
                           {{ $user->id === auth()->id() ? 'disabled opacity-50' : '' }}>
@@ -132,7 +132,7 @@
                     Hapus Akun
                   </button>
                 </div>
-              </details>
+              </div>
             </td>
           </tr>
         @endforeach
@@ -143,7 +143,7 @@
 
 {{-- Modal Tambah Admin --}}
 <div id="add-admin-modal" hidden class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-4">
-  <div class="w-full max-w-[420px] rounded-[22px] bg-white p-6 shadow-[0_30px_80px_rgba(12,39,31,.20)]">
+  <div class="w-full max-w-[420px] rounded-[22px] bg-white/70 backdrop-blur-md p-6 shadow-[0_30px_80px_rgba(12,39,31,.20)]">
     <div class="mb-5 flex items-start justify-between">
       <div>
         <h2 class="text-xl font-extrabold tracking-[-0.03em] text-[#1a2320]">Tambah Admin Baru</h2>
@@ -159,14 +159,14 @@
       <label class="block">
         <span class="mb-1.5 block text-xs font-bold text-[#334155]">Nama lengkap</span>
         <input id="aa-name" name="name" type="text" autocomplete="off" placeholder="cth. Budi Santoso"
-               class="h-11 w-full rounded-xl border border-[#dbe5e1] bg-white px-4 text-sm outline-none transition focus:border-[#0cb48c] focus:ring-2 focus:ring-[#0cb48c]/10">
+               class="h-11 w-full rounded-xl border border-[#dbe5e1] bg-white/70 backdrop-blur-md px-4 text-sm outline-none transition focus:border-[#0cb48c] focus:ring-2 focus:ring-[#0cb48c]/10">
         <p id="aa-name-err" class="mt-1.5 hidden text-xs font-medium text-red-500"></p>
       </label>
 
       <label class="block">
         <span class="mb-1.5 block text-xs font-bold text-[#334155]">Alamat email</span>
         <input id="aa-email" name="email" type="email" autocomplete="off" placeholder="admin@contoh.com"
-               class="h-11 w-full rounded-xl border border-[#dbe5e1] bg-white px-4 text-sm outline-none transition focus:border-[#0cb48c] focus:ring-2 focus:ring-[#0cb48c]/10">
+               class="h-11 w-full rounded-xl border border-[#dbe5e1] bg-white/70 backdrop-blur-md px-4 text-sm outline-none transition focus:border-[#0cb48c] focus:ring-2 focus:ring-[#0cb48c]/10">
         <p id="aa-email-err" class="mt-1.5 hidden text-xs font-medium text-red-500"></p>
       </label>
 
@@ -174,7 +174,7 @@
         <span class="mb-1.5 block text-xs font-bold text-[#334155]">Kata sandi</span>
         <div class="relative">
           <input id="aa-password" name="password" type="password" placeholder="Min. 8 karakter"
-                 class="h-11 w-full rounded-xl border border-[#dbe5e1] bg-white px-4 pr-16 text-sm outline-none transition focus:border-[#0cb48c] focus:ring-2 focus:ring-[#0cb48c]/10">
+                 class="h-11 w-full rounded-xl border border-[#dbe5e1] bg-white/70 backdrop-blur-md px-4 pr-16 text-sm outline-none transition focus:border-[#0cb48c] focus:ring-2 focus:ring-[#0cb48c]/10">
           <button type="button" onclick="toggleAaPass('aa-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#0aa982]">Lihat</button>
         </div>
         <p id="aa-password-err" class="mt-1.5 hidden text-xs font-medium text-red-500"></p>
@@ -184,7 +184,7 @@
         <span class="mb-1.5 block text-xs font-bold text-[#334155]">Konfirmasi kata sandi</span>
         <div class="relative">
           <input id="aa-password-confirmation" name="password_confirmation" type="password" placeholder="Ulangi kata sandi"
-                 class="h-11 w-full rounded-xl border border-[#dbe5e1] bg-white px-4 pr-16 text-sm outline-none transition focus:border-[#0cb48c] focus:ring-2 focus:ring-[#0cb48c]/10">
+                 class="h-11 w-full rounded-xl border border-[#dbe5e1] bg-white/70 backdrop-blur-md px-4 pr-16 text-sm outline-none transition focus:border-[#0cb48c] focus:ring-2 focus:ring-[#0cb48c]/10">
           <button type="button" onclick="toggleAaPass('aa-password-confirmation', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#0aa982]">Lihat</button>
         </div>
         <p id="aa-confirm-err" class="mt-1.5 hidden text-xs font-medium text-red-500"></p>
@@ -302,6 +302,36 @@ document.getElementById('add-admin-modal').addEventListener('mousedown', functio
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeAddAdmin();
 });
+
+/* ── Menu titik tiga pengguna (panel dipindah ke body: menghindari patokan
+      position:fixed yang bergeser di dalam kartu kaca) ── */
+function closeAdminMenus() {
+  document.querySelectorAll('[data-admin-menu-panel]').forEach((p) => (p.hidden = true));
+}
+function toggleAdminMenu(btn) {
+  const panel = btn._panel || btn.closest('.menu').querySelector('[data-admin-menu-panel]');
+  if (!panel) return;
+  const willOpen = panel.hidden;
+  closeAdminMenus();
+  if (!willOpen) return;
+  if (panel.parentElement !== document.body) {
+    document.body.appendChild(panel);
+    btn._panel = panel;
+  }
+  panel.hidden = false;
+  const r = btn.getBoundingClientRect();
+  const w = 192;
+  panel.style.width = w + 'px';
+  panel.style.left = Math.max(8, Math.min(r.right - w, window.innerWidth - w - 8)) + 'px';
+  const below = r.bottom + 4;
+  panel.style.top = (below + panel.offsetHeight > window.innerHeight - 8 ? Math.max(8, r.top - panel.offsetHeight - 4) : below) + 'px';
+}
+document.addEventListener('click', function (e) {
+  const btn = e.target.closest('[data-admin-menu-btn]');
+  if (btn) { toggleAdminMenu(btn); return; }
+  if (!e.target.closest('[data-admin-menu-panel]')) closeAdminMenus();
+});
+window.addEventListener('resize', closeAdminMenus);
 
 /* ── Aksi Pengguna (Titik 3) ── */
 async function updateAdminUser(userId, action) {

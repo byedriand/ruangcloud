@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicShareController;
 use App\Http\Controllers\ShareController;
 use App\Http\Controllers\TrashController;
@@ -55,6 +56,21 @@ Route::middleware('auth')->group(function () {
         ->middleware(EnsureRole::class . ':admin')
         ->name('admin.users.destroy');
 
+    // Profil akun (dipakai bersama: user & admin)
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
+    Route::delete('/profile/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+
+    // Penayang foto profil dari disk public (lewat route agar tampil juga di artisan serve Windows)
+    Route::get('/avatars/{file}', function (string $file) {
+        $path = \Illuminate\Support\Facades\Storage::disk('public')->path('avatars/' . $file);
+        abort_unless(is_file($path), 404);
+
+        return response()->file($path);
+    })->where('file', '[A-Za-z0-9._-]+')->name('avatars.show');
+
     // Resumable chunk upload
     Route::post('/upload/init', [UploadController::class, 'init'])->name('upload.init');
     Route::get('/upload/{session}', [UploadController::class, 'status'])->name('upload.status');
@@ -77,6 +93,7 @@ Route::middleware('auth')->group(function () {
 
     // Tautan berbagi & sampah
     Route::delete('/shares/{share}', [ShareController::class, 'destroy'])->name('shares.destroy');
+    Route::delete('/shares/{share}/purge', [ShareController::class, 'purge'])->name('shares.purge');
     Route::post('/trash/{id}/restore', [TrashController::class, 'restore'])->name('trash.restore');
     Route::delete('/trash/{id}', [TrashController::class, 'purge'])->name('trash.purge');
     Route::delete('/trash', [TrashController::class, 'empty'])->name('trash.empty');

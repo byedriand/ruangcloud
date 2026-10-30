@@ -76,4 +76,18 @@ class ShareController extends Controller
 
         return response()->json(['ok' => true]);
     }
+
+    /** Hapus permanen catatan tautan berbagi dari daftar pemiliknya. */
+    public function purge(Request $request, ShareLink $share): JsonResponse
+    {
+        abort_unless($share->user_id === $request->user()->id, 403);
+
+        $name = $share->file()->withTrashed()->value('name') ?? '(file dihapus)';
+
+        $share->delete();
+
+        ActivityLog::record('share', Str::before($request->user()->name, ' ') . ' menghapus tautan berbagi untuk "' . $name . '"');
+
+        return response()->json(['ok' => true]);
+    }
 }

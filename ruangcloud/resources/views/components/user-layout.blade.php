@@ -4,18 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>{{ $title }} — RuangCloud</title>
+  <title>{{ $title }} â€” RuangCloud</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body data-folder-id="{{ $folderId }}">
-<div class="min-h-screen bg-[#f8faf9] text-slate-900">
+<div class="min-h-screen text-slate-900" style="background: radial-gradient(720px 420px at 85% -5%, rgba(52,211,153,.20), transparent 60%), radial-gradient(640px 480px at -10% 30%, rgba(45,212,191,.14), transparent 60%), radial-gradient(560px 420px at 55% 110%, rgba(16,185,129,.12), transparent 60%), linear-gradient(165deg, #f4faf7 0%, #eaf5ef 48%, #e6f4ee 100%);">
   <button type="button" id="sidebar-backdrop" hidden aria-label="Tutup menu" data-action="close-sidebar" class="fixed inset-0 z-30 bg-slate-900/30 backdrop-blur-sm lg:hidden"></button>
 
   {{-- Sidebar --}}
-  <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 flex w-[264px] -translate-x-full flex-col bg-[#0f2e26] px-5 pb-5 pt-6 text-white transition-transform duration-300 lg:translate-x-0">
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 flex w-[264px] -translate-x-full flex-col border-r border-white/10 bg-gradient-to-b from-[#0d2f25]/90 via-[#0b271e]/[0.93] to-[#071c15]/95 px-5 pb-5 pt-6 shadow-2xl shadow-emerald-950/30 backdrop-blur-2xl text-white transition-transform duration-300 lg:translate-x-0">
     <div class="mb-6 flex items-center justify-between px-1">
       <a href="{{ route('dashboard') }}" class="focus:outline-none"><x-brand :light="true" /></a>
       <button type="button" data-action="close-sidebar" class="rounded-lg p-1.5 text-slate-300 hover:bg-white/10 hover:text-white lg:hidden">
@@ -24,15 +24,15 @@
     </div>
 
     {{-- Tombol Unggah Baru --}}
-    <button type="button" data-action="open-upload" class="mb-6 flex h-12 items-center justify-center gap-2.5 rounded-2xl bg-emerald-500 text-sm font-extrabold text-white shadow-lg shadow-emerald-950/40 transition-all hover:bg-emerald-400 active:scale-[0.98]">
+    <button type="button" data-action="open-upload" class="mb-6 flex h-12 items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-sm font-extrabold text-white shadow-lg shadow-emerald-500/30 ring-1 ring-white/25 transition-all hover:from-emerald-400 hover:to-teal-300 active:scale-[0.98]">
       <x-icon name="plus" class="h-5 w-5" /> Unggah berkas baru
     </button>
 
     {{-- Menu Navigasi --}}
-    <nav class="space-y-1.5">
+    <nav class="space-y-2">
       @foreach ($nav as $item)
         <a href="{{ route($item['route']) }}"
-           class="flex h-11 w-full items-center gap-3.5 rounded-xl px-3.5 text-[15px] font-semibold transition-all {{ $active === $item['key'] ? 'bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-950/20' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
+           class="flex h-11 w-full items-center gap-3.5 rounded-xl px-3.5 text-[15px] font-semibold transition-all {{ $active === $item['key'] ? 'border border-white/25 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold shadow-lg shadow-emerald-500/25 ring-1 ring-white/20' : 'border border-white/[0.07] bg-white/[0.04] text-slate-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-md hover:border-white/[0.12] hover:bg-white/[0.09] hover:text-white' }}">
           <x-icon :name="$item['icon']" class="h-5 w-5 {{ $active === $item['key'] ? 'text-white' : 'text-emerald-300/80' }}" />
           {{ $item['label'] }}
           @if ($item['badge'])
@@ -43,7 +43,7 @@
     </nav>
 
     {{-- Widget Penyimpanan --}}
-    <div class="mt-auto rounded-2xl border border-white/10 bg-white/5 p-4">
+    <div class="mt-auto rounded-2xl border border-white/15 bg-white/[0.07] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md">
       <div class="mb-2.5 flex items-center justify-between text-sm">
         <span class="text-xs font-bold uppercase tracking-wider text-slate-200">Penyimpanan</span>
         <span class="font-black text-emerald-400">{{ $storage['percent'] }}%</span>
@@ -58,11 +58,14 @@
     </div>
 
     {{-- Profil Pengguna & Keluar --}}
-    <button type="button" data-action="open-logout" title="Keluar dari akun" class="group mt-4 flex w-full items-center gap-3 rounded-2xl border border-transparent p-2 text-left transition-colors hover:bg-white/10">
-      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-sm font-extrabold text-white">{{ $user['initials'] }}</div>
+    <button type="button" data-action="open-logout" title="Keluar dari akun" class="group mt-4 flex w-full items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.04] p-2 text-left backdrop-blur-md transition-colors hover:bg-white/10">
+      @if ($user['avatar_url'])
+        <img src="{{ $user['avatar_url'] }}" alt="Foto profil" class="h-10 w-10 shrink-0 rounded-xl object-cover">
+      @else
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-sm font-extrabold text-white shadow-lg shadow-emerald-950/30">{{ $user['initials'] }}</div>
+      @endif
       <div class="min-w-0 flex-1">
         <p class="truncate text-sm font-bold text-white">{{ $user['name'] }}</p>
-        <p class="truncate text-xs text-slate-300">{{ $user['email'] }}</p>
       </div>
       <span class="rounded-lg bg-rose-500/20 px-2.5 py-1 text-xs font-bold text-rose-300 transition hover:bg-rose-500/30 group-hover:bg-rose-500/30">Keluar</span>
     </button>
@@ -71,24 +74,31 @@
   {{-- Konten Utama --}}
   <div class="lg:pl-[264px]">
     {{-- Header Atas --}}
-    <header class="sticky top-0 z-20 flex h-[76px] items-center gap-4 border-b border-slate-200/90 bg-white/95 px-5 backdrop-blur md:px-8">
+    <header class="sticky top-0 z-20 flex h-[76px] items-center gap-4 border-b border-white/60 bg-white/70 px-5 shadow-[0_8px_30px_-12px_rgba(6,40,30,0.12)] backdrop-blur-xl md:px-8">
       <button type="button" aria-label="Buka menu" data-action="open-sidebar" class="rounded-xl p-2 text-slate-600 hover:bg-slate-100 lg:hidden">
         <x-icon name="menu" class="h-6 w-6" />
       </button>
 
       <form method="GET" action="{{ route('files.index') }}" class="relative max-w-[480px] flex-1">
-        <x-icon name="search" class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-        <input id="search" name="q" value="{{ request('q') }}" type="text" autocomplete="off" class="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50/80 pl-11 pr-4 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10" placeholder="Cari file atau folder, tekan Enter...">
+        <x-icon name="search" class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-emerald-600" />
+        <input id="search" name="q" value="{{ request('q') }}" type="text" autocomplete="off" class="h-11 w-full rounded-2xl border border-white/60 bg-gradient-to-r from-white/75 via-white/60 to-emerald-100/40 pl-11 pr-4 text-sm font-medium text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_28px_-12px_rgba(6,40,30,0.28)] outline-none backdrop-blur-xl transition placeholder:text-slate-500 hover:from-white/85 hover:to-emerald-100/60 focus:border-emerald-400 focus:from-white/90 focus:to-white/85 focus:ring-4 focus:ring-emerald-500/15" placeholder="Cari file atau folder, tekan Enter...">
       </form>
 
       <div class="ml-auto flex items-center gap-3">
-        <a href="{{ route('activity.index') }}" aria-label="Aktivitas" class="relative rounded-xl p-2.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800">
+        <a href="{{ route('activity.index') }}" aria-label="Aktivitas" class="relative rounded-2xl border border-white/60 bg-white/60 p-2.5 text-slate-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_20px_-10px_rgba(6,40,30,0.25)] backdrop-blur-xl transition hover:bg-white/85 hover:text-emerald-700">
           <x-icon name="bell" class="h-5 w-5" />
+          <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white/80"></span>
         </a>
         <div class="hidden h-8 w-px bg-slate-200 sm:block"></div>
-        <div class="hidden h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-xs font-extrabold text-emerald-800 sm:flex">
-          {{ $user['initials'] }}
-        </div>
+        <a href="{{ route('profile.edit') }}" title="Profil saya" class="hidden shrink-0 sm:block">
+          @if ($user['avatar_url'])
+            <img src="{{ $user['avatar_url'] }}" alt="Foto profil" class="h-9 w-9 rounded-xl object-cover shadow-md ring-2 ring-white/70">
+          @else
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-xs font-extrabold text-emerald-800">
+              {{ $user['initials'] }}
+            </div>
+          @endif
+        </a>
       </div>
     </header>
 
@@ -99,7 +109,7 @@
   </div>
 
   {{-- Kartu Progres Unggahan (diisi uploader.js) --}}
-  <div id="upload-card" hidden class="fixed bottom-6 right-6 z-30 w-[360px] overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-2xl shadow-slate-900/15 sm:right-8">
+  <div id="upload-card" hidden class="fixed bottom-6 right-6 z-30 w-[360px] overflow-hidden rounded-2xl glass-card shadow-2xl shadow-slate-900/15 sm:right-8">
     <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
       <p class="text-sm font-extrabold text-slate-900">Unggahan</p>
       <span id="upload-count" class="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-extrabold text-emerald-700"></span>
@@ -109,7 +119,7 @@
 
   {{-- Modal Upload --}}
   <div id="upload-modal" hidden class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
-    <div class="w-full max-w-[500px] rounded-3xl bg-white p-6 shadow-2xl md:p-7">
+    <div class="w-full max-w-[500px] glass-card rounded-3xl p-6 shadow-2xl md:p-7">
       <div class="mb-5 flex items-start justify-between">
         <div>
           <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Unggah file</h2>
@@ -127,7 +137,7 @@
         </div>
         <p class="text-base font-bold text-slate-800">Tarik dan jatuhkan file ke sini</p>
         <p class="mt-1 text-sm text-slate-500">atau <span class="font-bold text-emerald-600 hover:underline">pilih dari komputer Anda</span></p>
-        <span class="mt-4 rounded-full bg-white px-3.5 py-1 text-xs font-semibold text-slate-600 shadow-sm border border-slate-200/80">Maksimum 5 GB per file</span>
+        <span class="mt-4 rounded-full bg-white/85 px-3.5 py-1 backdrop-blur text-xs font-semibold text-slate-600 shadow-sm border border-slate-200/80">Maksimum 5 GB per file</span>
       </label>
 
       <div class="mt-4 flex items-center gap-3 rounded-2xl bg-slate-50 p-3.5 text-xs text-slate-600 border border-slate-200/80">
@@ -139,7 +149,7 @@
 
   {{-- Modal Bagikan --}}
   <div id="share-modal" hidden class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
-    <div class="w-full max-w-[460px] rounded-3xl bg-white p-6 shadow-2xl md:p-7">
+    <div class="w-full max-w-[460px] glass-card rounded-3xl p-6 shadow-2xl md:p-7">
       <div class="mb-5 flex items-start justify-between">
         <div class="min-w-0">
           <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Bagikan file</h2>
@@ -182,7 +192,7 @@
 
   {{-- Modal Pindahkan --}}
   <div id="move-modal" hidden class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
-    <div class="w-full max-w-[420px] rounded-3xl bg-white p-6 shadow-2xl md:p-7">
+    <div class="w-full max-w-[420px] glass-card rounded-3xl p-6 shadow-2xl md:p-7">
       <div class="mb-5 flex items-start justify-between">
         <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Pindahkan file</h2>
         <button type="button" data-action="close-dialog" data-dialog="move-modal" class="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
@@ -204,7 +214,7 @@
 
   {{-- Modal Ubah Nama File --}}
   <div id="rename-modal" hidden class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
-    <div class="w-full max-w-[460px] rounded-3xl bg-white p-6 shadow-2xl md:p-7">
+    <div class="w-full max-w-[460px] glass-card rounded-3xl p-6 shadow-2xl md:p-7">
       <div class="mb-4 flex items-start justify-between">
         <div>
           <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Ubah nama file</h2>
@@ -241,7 +251,7 @@
 
   {{-- Modal Konfirmasi Keluar Akun --}}
   <div id="logout-modal" hidden class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
-    <div class="w-full max-w-[400px] rounded-3xl bg-white p-7 text-center shadow-2xl">
+    <div class="w-full max-w-[400px] glass-card rounded-3xl p-7 text-center shadow-2xl">
       <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
         <x-icon name="logout" class="h-7 w-7" />
       </div>
@@ -297,12 +307,13 @@
       </div>
       <div id="preview-loading" class="flex flex-col items-center gap-3 text-white/60">
         <svg class="h-9 w-9 animate-spin text-emerald-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
-        <p class="text-sm font-medium">Memuat pratinjau…</p>
+        <p class="text-sm font-medium">Memuat pratinjauâ€¦</p>
       </div>
     </div>
   </div>
 
   {{-- Toast Pemberitahuan --}}
+  @include('components.success-popup')
   <div id="toast" hidden class="fixed left-1/2 top-6 z-[60] -translate-x-1/2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-2xl"></div>
 </div>
 </body>

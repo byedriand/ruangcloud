@@ -31,7 +31,7 @@
     </div>
 
     {{-- Status Jaringan Card --}}
-    <div class="flex flex-col justify-between rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm">
+    <div class="flex flex-col justify-between rounded-3xl glass-card p-6 shadow-sm">
       <div>
         <div class="mb-5 flex items-center justify-between">
           <div>
@@ -87,7 +87,7 @@
         <x-folder-card :name="$folder['name']" :files="$folder['files']" :tone="$folder['tone']" :href="route('files.index', ['folder' => $folder['id']])" />
       @empty
         <div class="col-span-full flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/60 p-8 text-center">
-          <div class="mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-slate-400 shadow-sm">
+          <div class="mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/80 text-slate-400 shadow-sm backdrop-blur">
             <x-icon name="folder" class="h-6 w-6 text-emerald-500" />
           </div>
           <p class="text-sm font-bold text-slate-800">Belum ada folder yang dibuat</p>

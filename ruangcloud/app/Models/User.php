@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -21,11 +22,18 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'avatar',
         'password',
         'role',
         'is_active',
         'quota_bytes',
     ];
+
+    /** URL foto profil, atau null bila belum memasang foto. */
+    public function avatarUrl(): ?string
+    {
+        return $this->avatar ? route('avatars.show', ['file' => basename($this->avatar)]) : null;
+    }
 
     /**
      * The attributes that should be hidden for serialization.

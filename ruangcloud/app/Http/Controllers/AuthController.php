@@ -81,7 +81,8 @@ class AuthController extends Controller
         $user = Auth::user();
         ActivityLog::record('login', Str::before($user->name, ' ') . ' masuk ke sistem');
 
-        return redirect()->route($user->role === 'admin' ? 'admin' : 'dashboard');
+        return redirect()->route($user->role === 'admin' ? 'admin' : 'dashboard')
+            ->with('success', 'Login berhasil! Selamat datang kembali, ' . Str::before($user->name, ' ') . '.');
     }
 
     public function logout(Request $request)

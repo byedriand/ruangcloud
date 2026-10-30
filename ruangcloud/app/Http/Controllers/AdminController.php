@@ -14,6 +14,21 @@ use Illuminate\Support\Carbon;
 
 class AdminController extends Controller
 {
+    /**
+     * Samarkan nama berkas di teks aktivitas untuk tampilan admin:
+     * "mengunduh \"Mecak.png\"" menjadi "mengunduh berkas PNG" (privasi pengguna).
+     */
+    private function anonymizeFileNames(string $text): string
+    {
+        return preg_replace_callback('/"([^"]+)"/', function (array $m) {
+            if (preg_match('/\.([A-Za-z0-9]{2,5})$/', $m[1], $e)) {
+                return 'berkas ' . strtoupper($e[1]);
+            }
+
+            return $m[0];
+        }, $text);
+    }
+
     public function index(Request $request)
     {
         $navItems = [
@@ -74,7 +89,7 @@ class AdminController extends Controller
         $icons = ['upload' => 'upload', 'login' => 'users', 'download' => 'download', 'delete' => 'trash', 'replicate' => 'archive', 'folder' => 'folder'];
         $activities = ActivityLog::latest()->take(4)->get()->map(fn (ActivityLog $a) => [
             'icon' => $icons[$a->action] ?? 'activity',
-            'text' => $a->description,
+            'text' => $this->anonymizeFileNames($a->description),
             'time' => $a->created_at->copy()->locale('id')->diffForHumans(),
         ])->all();
 
@@ -133,6 +148,8 @@ class AdminController extends Controller
             ->latest()
             ->take(10)
             ->get();
+
+        $auditLogs->each(fn (ActivityLog $log) => $log->description = $this->anonymizeFileNames($log->description));
 
         $auditStats = collect(['upload', 'login', 'download', 'delete', 'share'])
             ->map(fn ($act) => [

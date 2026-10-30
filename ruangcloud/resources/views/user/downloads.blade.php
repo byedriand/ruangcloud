@@ -10,9 +10,9 @@
 
   {{-- Ringkasan --}}
   <div class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-3">
-    <div class="rounded-3xl border border-slate-200/90 bg-white p-5 shadow-sm">
+    <div class="rounded-3xl glass-card p-5 shadow-sm">
       <div class="flex items-center gap-3.5">
-        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/30">
           <x-icon name="file" class="h-5.5 w-5.5" />
         </div>
         <div>
@@ -21,9 +21,9 @@
         </div>
       </div>
     </div>
-    <div class="rounded-3xl border border-slate-200/90 bg-white p-5 shadow-sm">
+    <div class="rounded-3xl glass-card p-5 shadow-sm">
       <div class="flex items-center gap-3.5">
-        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/30">
           <x-icon name="download" class="h-5.5 w-5.5" />
         </div>
         <div>
@@ -32,12 +32,12 @@
         </div>
       </div>
     </div>
-    <div class="col-span-2 flex items-center rounded-3xl border border-emerald-100 bg-emerald-50/60 p-5 lg:col-span-1">
-      <p class="text-sm leading-relaxed text-emerald-900">Centang beberapa file lalu klik <b>Unduh terpilih</b> untuk mengunduhnya satu demi satu secara otomatis.</p>
+    <div class="col-span-2 flex items-center rounded-3xl bg-gradient-to-br from-[#0d2f25] via-[#0f3d2e] to-teal-800 p-5 shadow-xl shadow-emerald-950/25 lg:col-span-1">
+      <p class="text-sm leading-relaxed text-emerald-50/90">Centang beberapa file lalu klik <b>Unduh terpilih</b> untuk mengunduhnya satu demi satu secara otomatis.</p>
     </div>
   </div>
 
-  <section class="overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-sm">
+  <section class="overflow-hidden rounded-3xl glass-card shadow-sm">
     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-6 py-4.5">
       <div>
         <h2 class="text-base font-extrabold tracking-tight text-slate-900 md:text-lg">Semua File</h2>
@@ -50,7 +50,7 @@
                  class="h-10 w-56 rounded-xl border border-slate-200 bg-slate-50/80 pl-10 pr-3.5 text-sm font-medium outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10">
         </div>
         <button type="button" id="dl-bulk" disabled
-                class="flex h-10 items-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">
+                class="flex h-10 items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:from-emerald-400 hover:to-teal-400 disabled:cursor-not-allowed disabled:bg-none disabled:bg-slate-300 disabled:shadow-none">
           <x-icon name="download" class="h-4.5 w-4.5" /> Unduh terpilih (<span id="dl-selected-count">0</span>)
         </button>
       </div>
@@ -74,28 +74,27 @@
             <span>Ukuran</span>
             <span class="text-right">Aksi</span>
           </div>
-          {{-- Template baris unggahan: diklon oleh uploader.js per job --}}
+          {{-- Template baris unggahan aktif: dikloning uploader.js per unggahan yang berjalan --}}
           <template id="upload-row-template">
-            <div class="grid grid-cols-[36px_minmax(260px,1.8fr)_1fr_110px_150px] items-center gap-4 border-b border-emerald-100 bg-emerald-50/60 px-6 py-3.5">
-              <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0 4 4m-4-4L8 8"/><path d="M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16"/></svg>
-              </div>
-              <div class="min-w-0">
-                <p class="ju-name truncate text-sm font-bold text-slate-900">-</p>
-                <div class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-emerald-100">
-                  <div class="ju-bar upload-progress h-full rounded-full bg-emerald-500 transition-all" style="width: 0%"></div>
+            <div hidden class="grid grid-cols-[36px_minmax(260px,1.8fr)_1fr_110px_150px] items-center gap-4 border-b border-emerald-100/70 bg-emerald-50/40 px-6 py-3.5">
+              <span></span>
+              <div class="flex min-w-0 items-center gap-3.5">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100/80 text-emerald-600">
+                  <x-icon name="upload" class="h-5 w-5" />
                 </div>
-                <p class="ju-meta mt-1 text-xs text-slate-500">Menyiapkan unggahan…</p>
+                <div class="min-w-0 flex-1">
+                  <p class="ju-name truncate text-sm font-bold text-slate-900">-</p>
+                  <div class="mt-2 h-2 overflow-hidden rounded-full bg-emerald-100">
+                    <div class="ju-bar upload-progress h-full rounded-full bg-emerald-500 transition-all" style="width: 0%"></div>
+                  </div>
+                  <p class="ju-meta mt-1.5 text-xs text-slate-500">Menyiapkan unggahan…</p>
+                </div>
               </div>
-              <span class="ju-status text-sm font-semibold text-emerald-700">0%</span>
+              <span class="ju-status text-sm font-extrabold text-emerald-600">0%</span>
               <span class="ju-size text-sm font-semibold text-slate-700">-</span>
               <div class="flex items-center justify-end gap-2">
-                <button type="button" data-action="toggle-upload" class="flex h-9 items-center rounded-xl bg-emerald-600 px-3.5 text-xs font-bold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-500">
-                  <span class="ju-toggle-label">Jeda</span>
-                </button>
-                <button type="button" data-action="cancel-upload" class="flex h-9 items-center rounded-xl border border-rose-200 px-3.5 text-xs font-bold text-rose-600 transition hover:bg-rose-50">
-                  Batal
-                </button>
+                <button type="button" data-action="toggle-upload" class="ju-toggle-label inline-flex h-9.5 items-center rounded-xl bg-emerald-600 px-4 text-xs font-bold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-500 active:scale-[0.98]">Jeda</button>
+                <button type="button" data-action="cancel-upload" class="inline-flex h-9.5 items-center rounded-xl border border-rose-200 px-4 text-xs font-bold text-rose-500 transition hover:bg-rose-50">Batal</button>
               </div>
             </div>
           </template>
@@ -121,7 +120,7 @@
                         data-size="{{ $file['sizeRaw'] }}"
                         data-mime="{{ $file['mime'] }}"
                         data-url="{{ $file['downloadUrl'] }}"
-                        class="inline-flex h-9.5 items-center gap-2 rounded-xl bg-emerald-600 px-4 text-xs font-bold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-500 active:scale-[0.98]">
+                        class="inline-flex h-9.5 items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 text-xs font-bold text-white shadow-md shadow-emerald-600/20 transition hover:from-emerald-400 hover:to-teal-400 active:scale-[0.98]">
                   <x-icon name="download" class="h-4 w-4" /> Unduh
                 </button>
               </div>

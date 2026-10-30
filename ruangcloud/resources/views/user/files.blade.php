@@ -18,11 +18,11 @@
     </div>
     <div class="flex flex-wrap items-center gap-2.5">
       @if ($folder)
-        <button type="button" data-action="rename-folder" data-folder-id="{{ $folder->id }}" data-name="{{ $folder->name }}" class="h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 hover:bg-slate-50 transition">Ubah nama</button>
-        <button type="button" data-action="delete-folder" data-folder-id="{{ $folder->id }}" data-redirect="{{ route('files.index', $folder->parent_id ? ['folder' => $folder->parent_id] : []) }}" class="h-11 rounded-xl border border-rose-200 bg-white px-4 text-sm font-bold text-rose-600 hover:bg-rose-50 transition">Hapus folder</button>
+        <button type="button" data-action="rename-folder" data-folder-id="{{ $folder->id }}" data-name="{{ $folder->name }}" class="h-11 rounded-xl border border-slate-200 bg-white/70 backdrop-blur-md px-4 text-sm font-bold text-slate-700 hover:bg-slate-50 transition">Ubah nama</button>
+        <button type="button" data-action="delete-folder" data-folder-id="{{ $folder->id }}" data-redirect="{{ route('files.index', $folder->parent_id ? ['folder' => $folder->parent_id] : []) }}" class="h-11 rounded-xl border border-rose-200 bg-white/70 backdrop-blur-md px-4 text-sm font-bold text-rose-600 hover:bg-rose-50 transition">Hapus folder</button>
       @endif
-      <button type="button" data-action="add-folder" data-parent-id="{{ $folder?->id }}" class="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50"><x-icon name="folder" class="h-4.5 w-4.5 text-slate-500" /> Folder baru</button>
-      <button type="button" data-action="open-upload" class="flex h-11 items-center gap-2 rounded-xl bg-emerald-600 px-4.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500"><x-icon name="upload" class="h-4.5 w-4.5" /> Unggah berkas</button>
+      <button type="button" data-action="add-folder" data-parent-id="{{ $folder?->id }}" class="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white/70 backdrop-blur-md px-4 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50"><x-icon name="folder" class="h-4.5 w-4.5 text-slate-500" /> Folder baru</button>
+      <button type="button" data-action="open-upload" class="flex h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:from-emerald-400 hover:to-teal-400"><x-icon name="upload" class="h-4.5 w-4.5" /> Unggah berkas</button>
     </div>
   </div>
 

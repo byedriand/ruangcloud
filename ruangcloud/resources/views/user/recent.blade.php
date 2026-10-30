@@ -5,7 +5,7 @@
       Ruang kerja saya
     </div>
     <h1 class="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">Berkas Terbaru</h1>
-    <p class="mt-1.5 text-base text-slate-600">50 file yang terakhir Anda unggah dari semua folder.</p>
+
   </div>
 
   <x-file-table :files="$rows" title="Berkas yang Baru Diunggah" />

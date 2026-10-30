@@ -168,6 +168,7 @@ class Fmt
         return [
             'upload' => 'upload', 'login' => 'users', 'download' => 'download', 'delete' => 'trash',
             'replicate' => 'archive', 'folder' => 'folder', 'share' => 'link', 'restore' => 'restore',
+            'profile' => 'user', 'avatar' => 'camera', 'password' => 'lock',
         ][$action] ?? 'activity';
     }
 }

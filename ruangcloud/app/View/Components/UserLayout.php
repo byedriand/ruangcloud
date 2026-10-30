@@ -28,6 +28,7 @@ class UserLayout extends Component
             'first_name' => Str::before($account->name, ' '),
             'email'      => $account->email,
             'initials'   => Fmt::initials($account->name),
+            'avatar_url' => $account->avatarUrl(),
         ];
 
         $activeShares = ShareLink::where('user_id', $account->id)
@@ -44,6 +45,7 @@ class UserLayout extends Component
             ['key' => 'downloads', 'label' => 'Download', 'icon' => 'download', 'route' => 'files.downloads', 'badge' => null],
             ['key' => 'activity', 'label' => 'Aktivitas', 'icon' => 'activity', 'route' => 'activity.index', 'badge' => null],
             ['key' => 'trash',    'label' => 'Sampah',    'icon' => 'trash',    'route' => 'trash.index',    'badge' => $trashed ?: null],
+            ['key' => 'profile',  'label' => 'Profil',    'icon' => 'user',     'route' => 'profile.edit',   'badge' => null],
         ];
 
         // Kuota: file di sampah tetap dihitung sampai dihapus permanen.
