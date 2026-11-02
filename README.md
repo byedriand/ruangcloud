@@ -8,7 +8,8 @@
 [![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![MariaDB](https://img.shields.io/badge/MariaDB-11-003545?style=for-the-badge&logo=mariadb&logoColor=white)](https://mariadb.org)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
 [![License](https://img.shields.io/badge/License-Academic%20%2F%20MIT-green?style=for-the-badge)](#lisensi)
 
 ---
@@ -21,31 +22,31 @@
 5. [Arsitektur Sistem (4 Lapisan)](#-arsitektur-sistem-4-lapisan)
 6. [Fitur Utama & Pemenuhan Kebutuhan Fungsional](#-fitur-utama--pemenuhan-kebutuhan-fungsional)
 7. [Mekanisme Inti Sistem](#-mekanisme-inti-sistem)
-   - [Alur Resumable Chunk Upload](#1-alur-resumable-chunk-upload)
-   - [Penyimpanan Terdistribusi & Replikasi](#2-penyimpanan-terdistribusi--replikasi)
-   - [Health Check & Failover Otomatis](#3-health-check--failover-otomatis)
 8. [Tumpukan Teknologi (Tech Stack)](#-tumpukan-teknologi-tech-stack)
-9. [Panduan Instalasi & Menjalankan](#-panduan-instalasi--menjalankan)
-10. [Akun Demo Pengujian](#-akun-demo-pengujian)
-11. [Perintah Khusus Pemeliharaan (CLI)](#-perintah-khusus-pemeliharaan-cli)
-12. [Struktur Direktori Proyek](#-struktur-direktori-proyek)
-13. [Rencana Pengujian & Kriteria Kelulusan](#-rencana-pengujian--kriteria-kelulusan)
-14. [Dasar Hukum & Standar Teknis](#-dasar-hukum--standar-teknis)
+9. [Menjalankan dengan Docker (Cara Utama)](#-menjalankan-dengan-docker-cara-utama)
+10. [Menjalankan Manual / Pengembangan Lokal](#-menjalankan-manual--pengembangan-lokal)
+11. [Akun Demo Pengujian](#-akun-demo-pengujian)
+12. [Perintah Khusus Pemeliharaan (CLI)](#-perintah-khusus-pemeliharaan-cli)
+13. [Struktur Direktori Proyek](#-struktur-direktori-proyek)
+14. [Rencana Pengujian & Kriteria Kelulusan](#-rencana-pengujian--kriteria-kelulusan)
+15. [Dasar Hukum & Standar Teknis](#-dasar-hukum--standar-teknis)
 
 ---
 
 ## 📖 Tentang Proyek
 
-**RuangCloud** adalah sistem informasi penyimpanan awan (cloud storage) mandiri yang dirancang untuk mengatasi keterbatasan unggah file berukuran besar dan mengeliminasi *Single Point of Failure* (SPOF) pada peladen tunggal. 
+**RuangCloud** adalah sistem informasi penyimpanan awan (cloud storage) mandiri yang dirancang untuk mengatasi keterbatasan unggah file berukuran besar dan mengeliminasi *Single Point of Failure* (SPOF) pada peladen tunggal.
 
-Sistem ini mengimplementasikan metode **Resumable Chunk Upload** (pemotongan berkas di sisi peramban klien dengan verifikasi checksum per chunk) serta **Penyimpanan Terdistribusi Multi-Node** dengan replikasi asinkron otomatis dan mekanisme failover cerdas.
+Sistem ini mengimplementasikan metode **Resumable Chunk Upload** (pemotongan berkas di sisi peramban klien dengan verifikasi checksum per chunk) serta **Penyimpanan Terdistribusi Multi-Node** dengan replikasi asinkron otomatis dan mekanisme failover baca dari replika yang sehat.
+
+Seluruh aplikasi kini berjalan di atas **Docker** (7 container: web, aplikasi, worker, database, dan 3 node penyimpanan) sehingga dapat dijalankan konsisten di mesin mana pun tanpa konfigurasi server manual.
 
 ---
 
 ## 👥 Tim Pengembang
 
 Disusun dan dikembangkan oleh **Kelompok 4**  
-**Program Studi Informatika / Sistem Informasi**  
+**Program Studi Sistem Informasi**  
 **Fakultas Ilmu Komputer dan Sistem Informasi (FIKSI)**  
 **Universitas Kebangsaan Republik Indonesia (UKRI)**  
 *Jl. Terusan Halimun No. 37, Lengkong, Kota Bandung, Jawa Barat 40263*
@@ -66,7 +67,7 @@ Disusun dan dikembangkan oleh **Kelompok 4**
 
 Berdasarkan Kerangka Acuan Kerja (KAK) dan dokumen Usulan Teknis (USTEK), terdapat 3 tantangan utama dalam penyimpanan berkas digital:
 
-1. **Kegagalan Unggah File Berukuran Besar**: Unggah berkas berkapasitas besar (≥ 5 GB) seringkali mengalami kegagalan akibat timeout koneksi HTTP atau fluktuasi jaringan, mengharuskan pengguna mengulang proses dari 0%.
+1. **Kegagalan Unggah File Berukuran Besar**: Unggah berkas berkapasitas besar (hingga 5 GB) seringkali mengalami kegagalan akibat timeout koneksi HTTP atau fluktuasi jaringan, mengharuskan pengguna mengulang proses dari 0%.
 2. **Single Point of Failure (SPOF)**: Penyimpanan yang hanya bertumpu pada satu peladen fisik berisiko tinggi terhadap kehilangan data permanen dan terhentinya operasional layanan saat peladen mengalami kerusakan (*down*).
 3. **Ketiadaan Tata Kelola Terpusat**: Belum adanya manajemen hak akses berbasis peran (RBAC), batas kuota penyimpanan, pembagian tautan terkontrol, dan jejak audit (*audit trail*) menyeluruh yang dapat dipertanggungjawabkan.
 
@@ -76,11 +77,11 @@ Berdasarkan Kerangka Acuan Kerja (KAK) dan dokumen Usulan Teknis (USTEK), terdap
 
 | No | Sasaran KAK / USTEK | Indikator Keberhasilan | Pendekatan Solusi RuangCloud |
 |:--:|:---|:---|:---|
-| 1 | **Unggah File Besar Andal** | File minimal 5 GB (hingga 20 GB) berhasil diunggah & dapat dilanjutkan dari chunk terakhir. | Client-side chunking (default 5 MB), session status di server, auto retry dengan exponential backoff, resume hingga 24 jam. |
-| 2 | **Ketersediaan Data Tinggi (HA)** | Minimal 2 replika pada node berbeda; layanan tetap beroperasi saat 1 node padam. | Replikasi asinkron via Laravel Queue, penempatan berbasis kapasitas, health check otomatis, dan read failover. |
-| 3 | **Integritas Data Mutlak** | Verifikasi Checksum SHA-256 berhasil 100% pada berkas hasil penggabungan. | Validasi hash SHA-256 per chunk, checksum total akhir, dan verifikasi ulang salinan replika. |
-| 4 | **Kinerja Memadai** | Menangani beban minimal 100 pengguna aktif bersamaan. | Antrean asinkron (queue worker), Redis/database cache, penggabungan berkas berbasis stream non-blocking. |
-| 5 | **Tingkat Kebergunaan** | Tingkat penerimaan pengujian pengguna (UAT) minimal 85%. | Antarmuka responsif ramah pengguna (desktop & mobile), progress bar interaktif, dialog konfirmasi. |
+| 1 | **Unggah File Besar Andal** | File hingga 5 GB berhasil diunggah & dapat dilanjutkan dari chunk terakhir. | Client-side chunking (5 MB), status sesi di server, resume hingga 24 jam. |
+| 2 | **Ketersediaan Data Tinggi (HA)** | Minimal 2 replika pada node berbeda; berkas tetap terunduh saat 1 node bermasalah. | Replikasi asinkron via Laravel Queue, failover baca ke replika sehat, status replika self-healing. |
+| 3 | **Integritas Data Mutlak** | Verifikasi Checksum SHA-256 berhasil 100% pada berkas hasil penggabungan. | Validasi SHA-256 per chunk dan checksum total akhir saat penggabungan. |
+| 4 | **Kinerja Memadai** | Menangani beban minimal 100 pengguna aktif bersamaan. | Antrean asinkron (queue worker), penggabungan berkas berbasis stream. |
+| 5 | **Tingkat Kebergunaan** | Tingkat penerimaan pengujian pengguna (UAT) minimal 85%. | Antarmuka kaca (glassmorphism) responsif, progress bar interaktif, dialog bertema menggantikan popup bawaan browser. |
 
 ---
 
@@ -91,14 +92,14 @@ Sistem RuangCloud dirancang dengan arsitektur 4 lapisan modular (*four-tier deco
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
 │                        LAPISAN KLIEN (FRONTEND)                        │
-│    Modern Web Browsers (Chrome, Firefox, Safari, Edge)                │
-│    • HTML5 File API (Blob Slicing & SHA-256 Crypto API)               │
+│    Modern Web Browsers (Chrome, Firefox, Safari, Edge)                 │
+│    • HTML5 File API (Blob Slicing & SHA-256 Crypto API)                │
 │    • Responsive UI (Tailwind CSS v4 + Vanilla JS Component System)     │
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │ HTTP / RESTful API (Chunk & Auth)
 ┌───────────────────────────────────▼────────────────────────────────────┐
 │                       LAPISAN APLIKASI (BACKEND)                       │
-│    Laravel 12 REST API Framework                                       │
+│    Laravel 12 REST API Framework (PHP-FPM, container Docker)           │
 │    • Session & Chunk Ingestion Coordinator                             │
 │    • Role-Based Access Control (RBAC) & Quota Enforcement              │
 │    • Background Queue Workers (AssembleUpload & ReplicateFile)         │
@@ -107,11 +108,12 @@ Sistem RuangCloud dirancang dengan arsitektur 4 lapisan modular (*four-tier deco
                    │ Query & Transaction             │ Read / Write / Health
 ┌──────────────────▼───────────────┐ ┌───────────────▼───────────────────┐
 │       LAPISAN DATA (DATABASE)     │ │  LAPISAN PENYIMPANAN TERDISTRIBUSI │
-│  MySQL Database:                 │ │  Cluster Storage Nodes (Min. 2 Node)│
-│  • Metadata File & Folder Bersarang│ │  • Node Jakarta (Primary / Replica)│
-│  • Status Sesi Chunk & Upload    │ │  • Node Bandung (Primary / Replica) │
-│  • RBAC, Kuota, Share Links      │ │  • Node Surabaya (Primary / Replica)│
-│  • Audit Trail & Activity Logs   │ │  (Mendukung Local Disk & MinIO/S3) │
+│  MariaDB Database:               │ │  Cluster Storage Nodes (3 Node)    │
+│  • Metadata File & Folder        │ │  • Node Jakarta (Primary / Replica)│
+│  • Status Sesi Chunk & Upload    │ │  • Node Bandung (Primary / Replica)│
+│  • RBAC, Kuota, Share Links      │ │  • Node Surabaya (Primary/Replica) │
+│  • Audit Trail & Activity Logs   │ │  (Ditampilkan sebagai Server 1/2/3)│
+│  • Riwayat Unduhan Selesai       │ │                                    │
 └──────────────────────────────────┘ └───────────────────────────────────┘
 ```
 
@@ -121,24 +123,28 @@ Sistem RuangCloud dirancang dengan arsitektur 4 lapisan modular (*four-tier deco
 
 Sistem mengimplementasikan seluruh kebutuhan fungsional modul **F-01 hingga F-09**:
 
-- **F-01: Autentikasi dan Otorisasi (RBAC)**  
-  Mekanisme autentikasi aman dengan *Role-Based Access Control* memisahkan hak akses antara **Administrator** dan **Pengguna**. Password diamankan dengan hashing bcrypt, dilengkapi proteksi serangan CSRF dan session fixation.
-- **F-02: Manajemen File dan Folder Lengkap**  
-  Pengorganisasian berkas dengan struktur folder bertingkat (*nested folders*), breadcrumb navigasi, pembuatan folder, pengubahan nama (*rename*), pemindahan berkas, pencarian cepat (*search filter*), pengunduhan langsung, dan sistem tempat sampah (*Trash / Soft Delete*) sebelum penghapusan permanen.
-- **F-03: Resumable Chunk Upload (Anti-Gagal)**  
-  Berkas besar dipecah di sisi klien menjadi potongan-potongan (default: 5 MB) dan diunggah secara sekuensial. Mendukung jeda (*pause*), lanjutkan (*resume*), dan pembatalan (*cancel*). Jika koneksi terputus, sesi bertahan selama 24 jam dan unggah dapat dilanjutkan langsung dari chunk terakhir tanpa mengulang.
-- **F-04: Progress dan Status Unggah Real-Time**  
-  Panel modal unggah interaktif yang menyajikan progress bar akurat, indikator persentase, kalkulasi kecepatan transfer rata-rata, estimasi sisa waktu unggah, dan antrean berkas (*upload queue*).
-- **F-05: Penyimpanan Terdistribusi & Replikasi Asinkron**  
-  File disimpan pada node primer yang dipilih secara cerdas berdasarkan sisa kapasitas penyimpanan terbanyak (*capacity-aware placement*). File kemudian direplikasi secara asinkron ke node lain (minimal 2 replika) melalui antrean background worker.
-- **F-06: Berbagi File Terkontrol (Secure Share Link)**  
-  Fitur tautan berbagi publik (`/s/{token}`) yang dapat dikonfigurasi dengan kata sandi pengaman opsional, batas tanggal kedaluwarsa (*expiration date*), dan kemampuan pencabutan hak akses sewaktu-waktu oleh pemilik file.
-- **F-07: Manajemen Kuota Penyimpanan Pengguna**  
-  Alokasi kuota per pengguna dengan widget indikator kapasitas pada sidebar. Dilengkapi peringatan visual dini saat kuota terpakai mencapai ambang batas kritis (≥ 85%).
-- **F-08: Dashboard Administrator Cerdas**  
-  Pusat kendali admin untuk memantau kapasitas total cluster, visualisasi status operasional masing-masing storage node (*Active / Offline*), statistik aktivitas unggahan berkas harian, dan ringkasan audit log sistem.
-- **F-09: Log Aktivitas & Jejak Audit (Audit Trail)**  
-  Pencatatan komprehensif atas seluruh aksi penting sistem (Login, Unggah, Hapus, Pulihkan, Bagikan, Ganti Nama, Failover Node) yang dilengkapi timestamp, identitas aktor, dan alamat IP klien untuk akuntabilitas.
+- **F-01: Autentikasi dan Otorisasi (RBAC)**
+  Autentikasi aman dengan *Role-Based Access Control* yang memisahkan hak akses **Administrator** dan **Pengguna**. Password ter-hash bcrypt, proteksi CSRF, indikator kekuatan kata sandi, tombol intip sandi, dan alur registrasi yang mengarahkan pengguna ke halaman login (tidak auto-login) dengan popup sukses.
+- **F-02: Manajemen File dan Folder Lengkap**
+  Folder bertingkat (*nested folders*) dengan breadcrumb, pembuatan/rename/hapus folder, pencarian cepat, pratinjau berkas, dan tempat sampah (*soft delete*). Setiap file dan folder memiliki **menu titik tiga** berisi aksi kontekstual; nama yang bentrok otomatis diberi penanda ` (1)`, ` (2)` ala Windows. File maupun folder dapat **diseret (drag & drop)** untuk dipindahkan ke folder lain atau ke breadcrumb. Kartu folder menampilkan foto/nama pemilik dan ukuran total isinya.
+- **F-03: Resumable Chunk Upload (Anti-Gagal)**
+  Berkas hingga **5 GB** dipecah di sisi klien menjadi chunk **5 MB** dan diunggah berurutan. Mendukung jeda (*pause*), lanjutkan (*resume*), dan batal (*cancel*), termasuk resume lintas sesi dari penyimpanan lokal peramban. Sesi unggah bertahan 24 jam (sliding) dan dapat dilanjutkan dari chunk terakhir tanpa mengulang.
+- **F-04: Progress dan Status Real-Time**
+  Baris transfer aktif menampilkan progress bar, persentase, kecepatan, estimasi sisa waktu, dan ukuran — untuk unggahan maupun unduhan.
+- **F-05: Penyimpanan Terdistribusi & Replikasi Asinkron**
+  File ditempatkan pada node primer berkapasitas bebas terbesar, lalu direplikasi asinkron oleh queue worker hingga **2 salinan fisik di node berbeda**. Unduhan dan pratinjau bersifat *self-healing*: sistem memeriksa semua replika ke disk, menyajikan dari replika yang sehat, dan memulihkan status replika yang terbukti ada.
+- **F-06: Berbagi Terkontrol (Secure Share Link)**
+  Tautan publik `/s/{token}` untuk **file maupun folder**, dengan kata sandi opsional dan masa berlaku **1 / 7 / 30 hari**, dapat dicabut sewaktu-waktu. Halaman publik folder menampilkan pemilik ("Dibagikan oleh"), daftar isi, unduh per file, dan unduh semua sebagai ZIP. Folder juga dapat diunduh sebagai ZIP oleh pemiliknya.
+- **Manajer Unduhan & Riwayat Satu Kali Unduh**
+  Klik *Unduh berkas* membawa pengguna ke halaman Download dan progres unduhan berjalan di sana. File yang **sudah selesai diunduh tercatat di basis data dan tidak dapat diunduh lagi**; riwayat dapat dihapus lewat menu titik tiga (menghapus riwayat membuka kembali izin unduh).
+- **F-07: Manajemen Kuota Penyimpanan Pengguna**
+  Kuota per pengguna (default **5 GB**, administrator 1.000 GB) dengan widget pemakaian di sidebar (termasuk berkas di sampah) dan halaman **Detail Penyimpanan** (`/penyimpanan`): rincian pemakaian per jenis file (8 kategori), per node (Server 1/2/3), daftar file terbesar, dan ringkasan sampah.
+- **Profil Pengguna**
+  Pengguna dapat mengubah nama, email, foto profil (avatar), dan kata sandi; setiap perubahan profil tercatat di Log Aktivitas.
+- **F-08: Admin Console**
+  Satu halaman konsol dengan panel **Ringkasan, Pengguna, Penyimpanan, Unggahan, dan Audit Log**. Admin dapat melihat detail pengguna, menjadikan/mencabut peran admin (dengan penjaga admin terakhir), dan mengatur kuota per pengguna. Nama berkas pengguna ditampilkan teranonimkan pada panel admin demi privasi, dan halaman Profil admin berada di dalam konsol.
+- **F-09: Log Aktivitas & Jejak Audit (Audit Trail)**
+  Pencatatan aksi penting sistem (login, unggah, unduh, hapus, pulihkan, bagikan, ganti nama, perubahan profil, aksi admin) lengkap dengan waktu dan identitas aktor.
 
 ---
 
@@ -152,7 +158,7 @@ Sistem mengimplementasikan seluruh kebutuhan fungsional modul **F-01 hingga F-09
       ├── 2. POST /upload/initiate ───────────────>│ Buat Sesi Upload                  │
       │<─── Balas Upload ID & Next Chunk Index ─────┤ (Status: active, TTL: 24h)       │
       │                                             │                                  │
-      ├── 3. PUT /upload/{id}/chunk (Chunk #1) ────>│ Verifikasi Ukuran & SHA-256      │
+      ├── 3. PUT /upload/{id}/chunk (Chunk #N) ───>│ Verifikasi Ukuran & SHA-256      │
       │<─── HTTP 200 OK (Chunk Tersimpan) ──────────┤ Simpan ke storage/chunks/        │
       │                                             │                                  │
       │ (Ulangi untuk seluruh chunk... Jika koneksi │                                  │
@@ -166,13 +172,14 @@ Sistem mengimplementasikan seluruh kebutuhan fungsional modul **F-01 hingga F-09
 ```
 
 ### 2. Penyimpanan Terdistribusi & Replikasi
-- **Penempatan Node Primer**: Saat proses penggabungan berkas selesai, sistem memeriksa node penyimpanan yang berstatus `active` dan memilih node dengan ruang penyimpanan bebas terbesar.
-- **Faktor Replikasi**: File otomatis disalin ke node cadangan hingga memenuhi target replikasi (default: 2 salinan fisik di node berbeda).
-- **Verifikasi Integritas Ganda**: Checksum SHA-256 dihitung pada file hasil gabungan di node primer dan diverifikasi ulang terhadap salinan di node replika.
+- **Penempatan Node Primer**: Saat penggabungan berkas selesai, sistem memilih node aktif dengan ruang bebas terbesar sebagai node primer.
+- **Faktor Replikasi**: File disalin ke node lain hingga terpenuhi target **2 salinan fisik** di node berbeda (status replika: `pending` → `synced`/`failed`).
+- **Verifikasi Integritas**: Checksum SHA-256 dihitung pada file hasil gabungan di node primer sebelum replika dinyatakan sah.
 
-### 3. Health Check & Failover Otomatis
-- Jika node primer mengalami gangguan fisik atau padam (*offline*), proses pengunduhan berkas dialihkan secara transparan (*transparent read failover*) ke node replika yang aktif tanpa menyebabkan *downtime* bagi pengguna.
-- Perintah artisan berkala mendeteksi ketidaksesuaian jumlah replika dan menjadwalkan ulang replikasi otomatis (*self-healing replication*).
+### 3. Failover Baca & Self-Healing
+- Jika node primer bermasalah, pengunduhan dan pratinjau berkas dialihkan secara transparan ke replika yang sehat (*transparent read failover*) tanpa downtime bagi pengguna.
+- Pemeriksaan replika bersifat *self-healing*: replika yang fisiknya ditemukan di disk dipulihkan statusnya menjadi `synced`, dan satu kegagalan baca tidak lagi mencap replika sebagai gagal permanen.
+- Perintah artisan `nodes:check` memeriksa kesehatan folder node dan menjadwalkan ulang replikasi yang kurang dari target.
 
 ---
 
@@ -180,96 +187,85 @@ Sistem mengimplementasikan seluruh kebutuhan fungsional modul **F-01 hingga F-09
 
 | Komponen | Teknologi | Keterangan |
 |:---|:---|:---|
-| **Backend Framework** | Laravel 12.x (PHP 8.2+) | RESTful API, Blade Component Engine, Queue Jobs, Eloquent ORM |
-| **Frontend UI** | Vanilla JS + Tailwind CSS v4 | Responsif, tanpa dependensi framework berat, performa tinggi |
-| **Database** | MySQL 8.0+ | Transaksional, relasi foreign key berindeks, UTF8MB4 |
-| **Queue / Asinkron** | Laravel Database Queue / Redis | Background processing penggabungan file & sinkronisasi replika |
-| **Penyimpanan Node** | Local Storage Multi-Directory / S3 | Simulasi multi-node (Jakarta, Bandung, Surabaya) / Object Storage |
-| **Keamanan & Standar** | SHA-256, Bcrypt, PSR-12, OWASP | Validasi MIME type, integritas cryptographic hash, CSRF protection |
+| **Backend Framework** | Laravel 12.x (PHP 8.2+) | RESTful API, Blade Components, Queue Jobs, Eloquent ORM |
+| **Frontend UI** | Vanilla JS + Tailwind CSS v4 + Vite 7 | Tema kaca (glassmorphism), responsif, tanpa framework JS berat |
+| **Database** | MariaDB 11 | Transaksional, foreign key berindeks, UTF8MB4 |
+| **Queue / Asinkron** | Laravel Database Queue | Penggabungan chunk & replikasi antar node oleh worker khusus |
+| **Penyimpanan Node** | Local Storage Multi-Directory | Simulasi cluster 3 node (Jakarta, Bandung, Surabaya) |
+| **Kontainerisasi** | Docker & Docker Compose | 7 service: web (nginx), app (PHP-FPM), worker, db, 3 node |
+| **Keamanan & Standar** | SHA-256, Bcrypt, PSR-12, OWASP | Validasi MIME, integritas hash kriptografis, proteksi CSRF |
 
 ---
 
-## 💻 Panduan Instalasi & Menjalankan
+## 🐳 Menjalankan dengan Docker (Cara Utama)
 
-### Prasyarat Sistem
-- **PHP** versi 8.2 atau lebih baru (ekstensi aktif: `fileinfo`, `pdo_mysql`, `mbstring`, `openssl`).
-- **Composer** versi 2.x.
-- **Node.js** (v18+) & **npm**.
-- **MySQL / MariaDB** (dapat menggunakan bundel XAMPP).
-- Konfigurasi PHP (`php.ini`): pastikan `upload_max_filesize` dan `post_max_size` minimal `20M` (default XAMPP 40M sudah sangat memadai karena pengiriman menggunakan chunk 5MB).
+Cara resmi dan yang direkomendasikan — tidak perlu XAMPP, PHP, atau Node.js di mesin host.
 
----
+### Prasyarat
+- **Docker Desktop** (Windows/macOS) atau Docker Engine + Compose plugin (Linux).
 
-### Langkah Instalasi
-
-#### 1. Clone Repositori & Masuk ke Folder Proyek
+### Langkah
 ```bash
 git clone https://github.com/byedriand/ruangcloud.git
 cd ruangcloud/ruangcloud
+docker compose up -d --build
 ```
 
-#### 2. Pasang Dependensi PHP & JavaScript
+Tunggu hingga semua container berstatus *Started/Healthy*. Migrasi database dan seeding data awal (**RuangCloudSeeder**: akun demo + 3 node penyimpanan) berjalan **otomatis** saat container aplikasi pertama kali menyala.
+
+Buka aplikasi di: **`http://localhost:8080`**
+
+### Peta Layanan & Port
+
+| Service | Port Host | Keterangan |
+|:---|:---:|:---|
+| `web` | **8080** | nginx → aplikasi RuangCloud |
+| `db` | 3307 | MariaDB 11 (database `ruangcloud`) |
+| `node-jakarta` | 8081 | Server 1 — node penyimpanan Jakarta |
+| `node-bandung` | 8082 | Server 2 — node penyimpanan Bandung |
+| `node-surabaya` | 8083 | Server 3 — node penyimpanan Surabaya |
+| `app` | — | PHP-FPM (internal) |
+| `worker` | — | Queue worker: perakitan chunk & replikasi |
+
+### Perintah Docker yang Sering Dipakai
 ```bash
-composer install
-npm install
+docker compose up -d --build   # bangun ulang setelah ada perubahan kode
+docker compose ps              # status seluruh container
+docker compose logs -f app     # pantau log aplikasi
+docker compose down            # hentikan semua container (data tetap tersimpan di volume)
 ```
 
-#### 3. Konfigurasi Environment (`.env`)
-Salin file template `.env.example` menjadi `.env`:
-```bash
-cp .env.example .env
-```
-Sesuaikan konfigurasi koneksi database MySQL Anda di `.env`:
-```env
-APP_NAME=RuangCloud
-APP_URL=http://localhost:8000
-APP_TIMEZONE=Asia/Jakarta
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=ruangcloud
-DB_USERNAME=root
-DB_PASSWORD=
-
-QUEUE_CONNECTION=database
-SESSION_DRIVER=database
-```
-
-Generate application key:
-```bash
-php artisan key:generate
-```
-
-#### 4. Migrasi Database & Seeding Data Awal
-Nyalakan Apache & MySQL pada panel kontrol XAMPP, buat database bernama `ruangcloud`, lalu jalankan:
-```bash
-php artisan migrate
-php artisan db:seed --class=RuangCloudSeeder
-```
-*Perintah ini akan membuat struktur tabel lengkap dan menginisialisasi akun demo serta 3 node penyimpanan (Jakarta, Bandung, Surabaya).*
+Panduan Docker lebih rinci tersedia di berkas `DOCKER.md` pada direktori aplikasi.
 
 ---
 
-### Menjalankan Aplikasi
+## 💻 Menjalankan Manual / Pengembangan Lokal
 
-Jalankan **3 terminal** terpisah pada direktori proyek:
+Alternatif untuk pengembangan tanpa Docker (misalnya dengan XAMPP):
 
-- **Terminal 1 (Web Server)**:
-  ```bash
-  php artisan serve
-  ```
-- **Terminal 2 (Queue Worker - Wajib untuk Penggabungan & Replikasi)**:
-  ```bash
-  php artisan queue:work --timeout=3600
-  ```
-  *(Catatan: Worker ini wajib berjalan agar proses penggabungan chunk file dan replikasi antar node dapat diselesaikan).*
-- **Terminal 3 (Vite Asset Bundler)**:
-  ```bash
-  npm run dev
-  ```
+### Prasyarat
+- PHP 8.2+ (ekstensi: `fileinfo`, `pdo_mysql`, `mbstring`, `openssl`, `zip`), Composer 2.x, Node.js 18+ & npm, MariaDB/MySQL.
+- `php.ini`: `upload_max_filesize` dan `post_max_size` harus lebih besar dari ukuran chunk 5 MB (pada paket Docker nilai ini sudah diatur 64M/72M).
 
-Buka peramban di: **`http://127.0.0.1:8000`** *(Gunakan `127.0.0.1` atau `localhost` demi menjamin tersedianya secure Web Crypto API untuk hashing SHA-256 di browser)*.
+### Langkah
+```bash
+cd ruangcloud/ruangcloud
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+# sesuaikan DB_* di .env, buat database "ruangcloud", lalu:
+php artisan migrate
+php artisan db:seed --class=RuangCloudSeeder
+```
+
+### Tiga proses yang harus berjalan
+```bash
+php artisan serve                 # Terminal 1 — web server
+php artisan queue:work            # Terminal 2 — worker (wajib: perakitan & replikasi)
+npm run dev                       # Terminal 3 — Vite (atau: npm run build)
+```
+Buka **`http://127.0.0.1:8000`**.
 
 ---
 
@@ -277,70 +273,70 @@ Buka peramban di: **`http://127.0.0.1:8000`** *(Gunakan `127.0.0.1` atau `localh
 
 Seluruh akun demo memiliki kata sandi default: **`ruangcloud2026`**
 
-| Role | Email | Password | Kapasitas Kuota | Akses Halaman |
+| Role | Email | Password | Kuota | Akses Halaman |
 |:---|:---|:---:|:---:|:---|
-| **Administrator** | `admin@ruangcloud.id` | `ruangcloud2026` | 1.000 GB | `/admin` (Cluster Dashboard, Nodes Health, Audit Log) |
-| **Pengguna** | `naufal@ruangcloud.id` | `ruangcloud2026` | 100 GB | `/dashboard` (Manajemen Berkas, Upload, Berbagi) |
-| **Pengguna** | `sona@ruangcloud.id` | `ruangcloud2026` | 100 GB | `/dashboard` (Akun Klien) |
-| **Pengguna** | `ghea@ruangcloud.id` | `ruangcloud2026` | 100 GB | `/dashboard` |
+| **Administrator** | `admin@ruangcloud.id` | `ruangcloud2026` | 1.000 GB | Admin Console (Ringkasan, Pengguna, Penyimpanan, Unggahan, Audit Log) |
+| **Pengguna** | `naufal@ruangcloud.id` | `ruangcloud2026` | 5 GB | Dashboard pengguna |
+| **Pengguna** | `sona@ruangcloud.id` | `ruangcloud2026` | 5 GB | Dashboard pengguna (akun klien) |
+| **Pengguna** | `ghea@ruangcloud.id` | `ruangcloud2026` | 5 GB | Dashboard pengguna |
+
+Akun pengguna yang mendaftar sendiri melalui halaman registrasi otomatis mendapat kuota **5 GB**.
 
 ---
 
 ## 🔧 Perintah Khusus Pemeliharaan (CLI)
 
-RuangCloud menyediakan perintah Artisan khusus untuk administrasi latar belakang:
+Pada lingkungan Docker, awali perintah dengan `docker compose exec app`.
 
-1. **Pemeriksaan Kesehatan Node & Pemulihan Replika (Self-Healing)**:
+1. **Pemeriksaan Kesehatan Node & Pemulihan Replika**:
    ```bash
    php artisan nodes:check
    ```
-   *Memeriksa ketersediaan folder node, memperbarui status kesehatan, melengkapi file yang replikanya kurang dari target, dan mengulangi replikasi yang sempat gagal.*
-
+   *Memeriksa ketersediaan folder node, memperbarui status kesehatan, dan menjadwalkan ulang replikasi yang kurang dari target atau sempat gagal.*
 2. **Pembersihan Chunk Kedaluwarsa (Garbage Collection)**:
    ```bash
    php artisan uploads:cleanup
    ```
-   *Menghapus potongan chunk dan sesi upload yang telah terbengkalai melewati masa toleransi 24 jam untuk mencegah pemborosan ruang penyimpanan.*
-
-*(Dapat dijadwalkan otomatis melalui scheduler Laravel `php artisan schedule:work`)*.
+   *Menghapus potongan chunk dan sesi unggah terbengkalai melewati masa toleransi 24 jam.*
+3. **Pembersihan Data Uji**:
+   ```bash
+   php artisan data:clean --force
+   ```
+   *Membersihkan data hasil pengujian (file, folder, dan sesi) dari basis data dan penyimpanan node.*
 
 ---
 
 ## 📁 Struktur Direktori Proyek
 
-Seluruh source code aplikasi dikelompokkan rapi di dalam direktori `ruangcloud/`:
-
 ```text
 byedriand/ruangcloud/ (Root Repositori GitHub)
-├── ruangcloud/           # Direktori utama kode aplikasi sistem RuangCloud
-│   ├── app/              # Logika inti aplikasi (Controllers, Models, Jobs, Services, CLI Commands)
-│   ├── bootstrap/        # Bootstrapping framework & registrasi provider
-│   ├── config/           # Berkas konfigurasi sistem (config/nodes.php, queue.php, dll.)
-│   ├── database/         # Migrasi skema database, factories, & seeder (RuangCloudSeeder)
-│   ├── docs/             # Dokumentasi riwayat & catatan teknis tahap pengembangan
-│   ├── public/           # Web server public root (index.php, robots.txt, favicon)
-│   ├── resources/        # Aset kode sumber frontend (Blade, Tailwind CSS, JS)
-│   ├── routes/           # Definisi rute aplikasi (web.php, console.php)
-│   ├── storage/          # Penyimpanan internal (chunks upload sementara & folder node cluster)
-│   ├── tests/            # Otomasi pengujian sistem (Unit & Feature tests)
-│   ├── .editorconfig     # Standar format editor
-│   ├── .env.example      # Template konfigurasi environment lokal
-│   ├── .gitattributes    # Atribut Git
-│   ├── .gitignore        # Filter pengabaian git untuk folder ruangcloud
-│   ├── artisan           # CLI runner Laravel
-│   ├── composer.json     # Definisi dependensi backend PHP
-│   ├── package.json      # Definisi dependensi frontend JavaScript & build tools
-│   ├── phpunit.xml       # Konfigurasi automated testing
-│   └── vite.config.js    # Konfigurasi bundler Vite
-├── .gitignore            # Filter pengabaian git untuk root repositori
-└── README.md             # Dokumentasi lengkap proyek sesuai USTEK
+├── README.md                  # Dokumentasi ini
+├── Project Documentation/     # Dokumen proyek (KAK/USTEK dan lampiran)
+└── ruangcloud/                # Direktori utama kode aplikasi
+    ├── app/                   # Controllers, Models, Jobs, Services, Support, Console Commands
+    ├── bootstrap/             # Bootstrapping framework
+    ├── config/                # Berkas konfigurasi sistem
+    ├── database/              # Migrasi & seeder (RuangCloudSeeder)
+    ├── docker/                # Konfigurasi nginx & php.ini untuk Docker
+    ├── public/                # Web root (index.php, aset terpublikasi)
+    ├── resources/             # Blade views, Tailwind CSS, JavaScript (uploader/downloader)
+    ├── routes/                # Definisi rute (web.php)
+    ├── storage/               # Chunk sementara & folder node cluster (app/nodes/*)
+    ├── tests/                 # Pengujian otomatis (Unit & Feature)
+    ├── Dockerfile             # Image multi-stage (build aset + PHP-FPM)
+    ├── docker-compose.yml     # 7 service: web, app, worker, db, node-jakarta/bandung/surabaya
+    ├── DOCKER.md              # Panduan menjalankan dengan Docker
+    ├── artisan                # CLI runner Laravel
+    ├── composer.json          # Dependensi backend PHP
+    ├── package.json           # Dependensi frontend & skrip build
+    └── vite.config.js         # Konfigurasi bundler Vite
 ```
 
 ---
 
 ## 🧪 Rencana Pengujian & Kriteria Kelulusan
 
-Sesuai **Bagian VIII USTEK**, sistem telah disiapkan untuk melalui serangkaian pengujian terukur:
+Sesuai **Bagian VIII USTEK**, sistem disiapkan untuk melalui serangkaian pengujian terukur:
 
 | Jenis Pengujian | Skenario Uji | Kriteria Kelulusan | Metode Pelaksanaan |
 |:---|:---|:---|:---|
@@ -348,8 +344,8 @@ Sesuai **Bagian VIII USTEK**, sistem telah disiapkan untuk melalui serangkaian p
 | **Resume Testing** | Unggah file besar, putuskan koneksi di tengah jalan, lanjutkan kembali. | Lanjut dari chunk terakhir tanpa mengulang dari awal; file hasil utuh. | Simulasi interupsi jaringan di berbagai titik persentase, verifikasi SHA-256. |
 | **Load Testing** | Pengujian beban multi-unggahan bersamaan. | Tetap stabil pada minimal 100 pengguna aktif simultan. | Pengujian simulasi bertahap pada antrean dan server. |
 | **Failover Testing** | Mematikan satu storage node aktif secara tiba-tiba. | File tetap dapat diunduh tanpa kendala dari node replika cadangan. | Pengujian pemadaman node simulasi di lingkungan pementasan (*staging*). |
-| **Security Testing** | Pengujian terhadap celah keamanan OWASP Top 10 & kontrol akses RBAC. | Tidak ditemukan kerentanan berisiko Tinggi atau Kritis (*Zero High/Critical Vulnerabilities*). | Pemindaian keamanan berkala, sanitasi input, validasi tipe & MIME berkas. |
-| **UAT (User Acceptance)**| Uji kebergunaan oleh perwakilan pengguna akhir. | Tingkat kepuasan penerimaan minimal **85%**. | Kuesioner penerimaan UAT terstruktur berdasarkan skenario kerja riil. |
+| **Security Testing** | Pengujian terhadap celah keamanan OWASP Top 10 & kontrol akses RBAC. | Tidak ditemukan kerentanan berisiko Tinggi atau Kritis. | Pemindaian keamanan berkala, sanitasi input, validasi tipe & MIME berkas. |
+| **UAT (User Acceptance)** | Uji kebergunaan oleh perwakilan pengguna akhir. | Tingkat kepuasan penerimaan minimal **85%**. | Kuesioner penerimaan UAT terstruktur berdasarkan skenario kerja riil. |
 
 ---
 
