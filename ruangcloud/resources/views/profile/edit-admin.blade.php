@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="min-h-screen bg-[#f8faf9] text-slate-900">
-  <div class="mx-auto max-w-3xl px-5 py-8 md:py-10">
+  <div class="mx-auto w-full max-w-4xl px-5 py-8 md:py-10">
     <a href="{{ route('admin') }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 transition hover:text-emerald-700">
       <x-icon name="chevron" class="h-4 w-4 rotate-180" />
       Kembali ke Admin Console

@@ -84,7 +84,7 @@
     </div>
     <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
       @forelse ($folders as $folder)
-        <x-folder-card :name="$folder['name']" :files="$folder['files']" :tone="$folder['tone']" :href="route('files.index', ['folder' => $folder['id']])" />
+        <x-folder-card :folder="$folder" :href="route('files.index', ['folder' => $folder['id']])" />
       @empty
         <div class="col-span-full flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/60 p-8 text-center">
           <div class="mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/80 text-slate-400 shadow-sm backdrop-blur">

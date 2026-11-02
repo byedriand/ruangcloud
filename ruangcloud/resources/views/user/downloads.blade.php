@@ -5,7 +5,7 @@
       Ruang kerja saya
     </div>
     <h1 class="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">Download File</h1>
-    <p class="mt-1.5 text-base text-slate-600">Semua file Anda dari seluruh folder, siap diunduh satu per satu atau beberapa sekaligus.</p>
+    <p class="mt-1.5 text-base text-slate-600">Unduhan yang sedang berjalan tampil di sini dengan progresnya. File yang sudah selesai diunduh tercatat sebagai riwayat dan tidak bisa diunduh lagi.</p>
   </div>
 
   {{-- Ringkasan --}}
@@ -13,11 +13,11 @@
     <div class="rounded-3xl glass-card p-5 shadow-sm">
       <div class="flex items-center gap-3.5">
         <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/30">
-          <x-icon name="file" class="h-5.5 w-5.5" />
+          <x-icon name="check" class="h-5.5 w-5.5" />
         </div>
         <div>
-          <p class="text-xl font-extrabold leading-none text-slate-900">{{ $totalFiles }}</p>
-          <p class="mt-1 text-xs font-semibold text-slate-500">File siap diunduh</p>
+          <p class="text-xl font-extrabold leading-none text-slate-900">{{ $totalCount }}</p>
+          <p class="mt-1 text-xs font-semibold text-slate-500">File selesai diunduh</p>
         </div>
       </div>
     </div>
@@ -28,54 +28,34 @@
         </div>
         <div>
           <p class="text-xl font-extrabold leading-none text-slate-900">{{ $totalSize }}</p>
-          <p class="mt-1 text-xs font-semibold text-slate-500">Total ukuran semua file</p>
+          <p class="mt-1 text-xs font-semibold text-slate-500">Total ukuran unduhan</p>
         </div>
       </div>
     </div>
     <div class="col-span-2 flex items-center rounded-3xl bg-gradient-to-br from-[#0d2f25] via-[#0f3d2e] to-teal-800 p-5 shadow-xl shadow-emerald-950/25 lg:col-span-1">
-      <p class="text-sm leading-relaxed text-emerald-50/90">Centang beberapa file lalu klik <b>Unduh terpilih</b> untuk mengunduhnya satu demi satu secara otomatis.</p>
+      <p class="text-sm leading-relaxed text-emerald-50/90">Mulai unduhan dari menu titik tiga file di <b>File saya</b>. File yang sudah <b>Selesai</b> tidak bisa diunduh lagi &mdash; hapus dari riwayat lewat titik tiga bila ingin mengunduh ulang.</p>
     </div>
   </div>
 
   <section class="overflow-hidden rounded-3xl glass-card shadow-sm">
     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-6 py-4.5">
       <div>
-        <h2 class="text-base font-extrabold tracking-tight text-slate-900 md:text-lg">Semua File</h2>
-        <p class="mt-0.5 text-xs text-slate-500"><span id="dl-visible-count">{{ count($rows) }}</span> file ditampilkan</p>
-      </div>
-      <div class="flex flex-wrap items-center gap-2.5">
-        <div class="relative">
-          <x-icon name="search" class="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-slate-400" />
-          <input id="dl-search" type="text" autocomplete="off" placeholder="Filter nama file..."
-                 class="h-10 w-56 rounded-xl border border-slate-200 bg-slate-50/80 pl-10 pr-3.5 text-sm font-medium outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10">
-        </div>
-        <button type="button" id="dl-bulk" disabled
-                class="flex h-10 items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:from-emerald-400 hover:to-teal-400 disabled:cursor-not-allowed disabled:bg-none disabled:bg-slate-300 disabled:shadow-none">
-          <x-icon name="download" class="h-4.5 w-4.5" /> Unduh terpilih (<span id="dl-selected-count">0</span>)
-        </button>
+        <h2 class="text-base font-extrabold tracking-tight text-slate-900 md:text-lg">Unduhan</h2>
+        <p class="mt-0.5 text-xs text-slate-500">Progres unduhan berjalan &amp; riwayat unduhan selesai</p>
       </div>
     </div>
 
-    @if (count($rows) === 0)
-      <div class="flex flex-col items-center px-6 py-16 text-center">
-        <div class="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
-          <x-icon name="download" class="h-7 w-7" />
+    <div class="overflow-x-auto">
+      <div class="min-w-[760px]">
+        <div id="dl-table-head" class="grid grid-cols-[36px_minmax(260px,1.8fr)_1fr_110px_150px] items-center gap-4 border-b border-slate-100 bg-slate-50/70 px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-500">
+          <span></span>
+          <span>Nama Berkas</span>
+          <span>Selesai Diunduh</span>
+          <span>Ukuran</span>
+          <span class="text-right">Aksi</span>
         </div>
-        <p class="text-base font-extrabold text-slate-800">Belum ada file untuk diunduh</p>
-        <p class="mt-1 text-sm text-slate-500">Unggah file pertama Anda, lalu file akan muncul di halaman ini.</p>
-      </div>
-    @else
-      <div class="overflow-x-auto">
-        <div class="min-w-[760px]">
-          <div id="dl-table-head" class="grid grid-cols-[36px_minmax(260px,1.8fr)_1fr_110px_150px] items-center gap-4 border-b border-slate-100 bg-slate-50/70 px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-slate-500">
-            <input type="checkbox" id="dl-check-all" class="h-4.5 w-4.5 rounded accent-emerald-600" title="Pilih semua">
-            <span>Nama Berkas</span>
-            <span>Tanggal Diunggah</span>
-            <span>Ukuran</span>
-            <span class="text-right">Aksi</span>
-          </div>
-          {{-- Template baris unggahan aktif: dikloning uploader.js per unggahan yang berjalan --}}
-          <template id="upload-row-template">
+        {{-- Template baris unggahan aktif: dikloning uploader.js per unggahan yang berjalan --}}
+        <template id="upload-row-template">
             <div hidden class="grid grid-cols-[36px_minmax(260px,1.8fr)_1fr_110px_150px] items-center gap-4 border-b border-emerald-100/70 bg-emerald-50/40 px-6 py-3.5">
               <span></span>
               <div class="flex min-w-0 items-center gap-3.5">
@@ -98,114 +78,52 @@
               </div>
             </div>
           </template>
-          @foreach ($rows as $file)
-            <div data-dl-row data-name="{{ mb_strtolower($file['name']) }}" class="grid grid-cols-[36px_minmax(260px,1.8fr)_1fr_110px_150px] items-center gap-4 border-b border-slate-100/80 px-6 py-3.5 last:border-0 transition-colors hover:bg-slate-50/70">
-              <input type="checkbox" class="dl-check h-4.5 w-4.5 rounded accent-emerald-600" data-url="{{ $file['downloadUrl'] }}" data-name="{{ $file['name'] }}">
+
+        <div id="dl-history">
+          @forelse ($rows as $row)
+            <div class="grid grid-cols-[36px_minmax(260px,1.8fr)_1fr_110px_150px] items-center gap-4 border-b border-slate-100/80 px-6 py-3.5 last:border-0 transition-colors hover:bg-slate-50/70">
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                <x-icon name="check" class="h-4.5 w-4.5" />
+              </span>
               <div class="flex min-w-0 items-center gap-3.5">
-                <div class="file-icon file-{{ $file['color'] }} h-10 w-10 shrink-0 rounded-xl">
-                  <x-icon :name="$file['icon']" class="h-5 w-5" />
+                <div class="file-icon file-{{ $row['color'] }} h-10 w-10 shrink-0 rounded-xl">
+                  <x-icon :name="$row['icon']" class="h-5 w-5" />
                 </div>
                 <div class="min-w-0">
-                  <p class="truncate text-sm font-bold text-slate-900">{{ $file['name'] }}</p>
-                  <p class="mt-0.5 truncate text-xs text-slate-500">{{ $file['type'] }} • {{ $file['folderName'] }}</p>
+                  <p class="truncate text-sm font-bold text-slate-900">{{ $row['name'] }}</p>
+                  <p class="mt-0.5 truncate text-xs text-slate-500">{{ $row['type'] }} &bull; {{ $row['folderName'] }}</p>
                 </div>
               </div>
-              <span class="text-sm text-slate-600">{{ $file['date'] }}</span>
-              <span class="text-sm font-semibold text-slate-700">{{ $file['size'] }}</span>
-              <div class="text-right">
-                <button type="button"
-                        data-action="download-file"
-                        data-file-id="{{ $file['id'] }}"
-                        data-name="{{ $file['name'] }}"
-                        data-size="{{ $file['sizeRaw'] }}"
-                        data-mime="{{ $file['mime'] }}"
-                        data-url="{{ $file['downloadUrl'] }}"
-                        class="inline-flex h-9.5 items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 text-xs font-bold text-white shadow-md shadow-emerald-600/20 transition hover:from-emerald-400 hover:to-teal-400 active:scale-[0.98]">
-                  <x-icon name="download" class="h-4 w-4" /> Unduh
-                </button>
+              <span class="text-sm text-slate-600">{{ $row['finishedAt'] }}</span>
+              <span class="text-sm font-semibold text-slate-700">{{ $row['size'] }}</span>
+              <div class="flex items-center justify-end gap-2">
+                <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">Selesai</span>
+                <div class="menu relative inline-block">
+                  <button type="button" data-menu-btn aria-label="Menu unduhan" class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">
+                    <x-icon name="more" class="h-4.5 w-4.5" />
+                  </button>
+                  <div data-menu-panel hidden class="fixed z-50 min-w-[210px] rounded-2xl glass-card p-2 text-left text-sm font-semibold text-slate-700 shadow-xl shadow-slate-900/10">
+                    <a href="{{ route('files.index', $row['folderId'] ? ['folder' => $row['folderId']] : []) }}" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition hover:bg-emerald-50">
+                      <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600"><x-icon name="folder" class="h-4 w-4" /></span> Buka di File saya
+                    </a>
+                    <button type="button" data-action="delete-download-record" data-record-id="{{ $row['recordId'] }}" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left font-semibold text-rose-600 transition hover:bg-rose-50">
+                      <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-rose-50 text-rose-500"><x-icon name="trash" class="h-4 w-4" /></span> Hapus dari riwayat
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          @endforeach
+          @empty
+            <div class="flex flex-col items-center px-6 py-16 text-center">
+              <div class="mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                <x-icon name="download" class="h-7 w-7" />
+              </div>
+              <p class="text-base font-extrabold text-slate-800">Belum ada riwayat unduhan</p>
+              <p class="mt-1 max-w-md text-sm text-slate-500">Unduh file lewat menu titik tiga di File saya. Selama prosesnya berjalan, progres unduhan tampil di sini; setelah selesai, file tercatat di daftar ini.</p>
+            </div>
+          @endforelse
         </div>
       </div>
-      <div id="dl-filter-empty" hidden class="px-6 py-12 text-center">
-        <p class="text-sm font-bold text-slate-700">Tidak ada file yang cocok dengan filter.</p>
-        <p class="mt-1 text-xs text-slate-500">Coba kata kunci lain.</p>
-      </div>
-    @endif
+    </div>
   </section>
-
-  <script>
-    (() => {
-      const checks = [...document.querySelectorAll('.dl-check')];
-      const checkAll = document.getElementById('dl-check-all');
-      const bulkBtn = document.getElementById('dl-bulk');
-      const countEl = document.getElementById('dl-selected-count');
-      const search = document.getElementById('dl-search');
-      const visibleEl = document.getElementById('dl-visible-count');
-      const filterEmpty = document.getElementById('dl-filter-empty');
-
-      const toast = (msg) => {
-        const el = document.getElementById('toast');
-        if (!el) return;
-        el.textContent = msg;
-        el.hidden = false;
-        clearTimeout(el._t);
-        el._t = setTimeout(() => { el.hidden = true; }, 3200);
-      };
-
-      const refresh = () => {
-        const selected = checks.filter(c => c.checked);
-        countEl.textContent = selected.length;
-        bulkBtn.disabled = selected.length === 0;
-        if (checkAll) {
-          const visible = checks.filter(c => c.closest('[data-dl-row]').style.display !== 'none');
-          checkAll.checked = visible.length > 0 && visible.every(c => c.checked);
-        }
-      };
-
-      checks.forEach(c => c.addEventListener('change', refresh));
-
-      checkAll?.addEventListener('change', () => {
-        checks.forEach(c => {
-          if (c.closest('[data-dl-row]').style.display !== 'none') c.checked = checkAll.checked;
-        });
-        refresh();
-      });
-
-      bulkBtn?.addEventListener('click', () => {
-        const selected = checks.filter(c => c.checked);
-        if (!selected.length) return;
-        const items = selected.map(c => {
-          const btn = c.closest('[data-dl-row]')?.querySelector('[data-action="download-file"]');
-          if (!btn) return null;
-          return {
-            id: Number(btn.dataset.fileId),
-            name: btn.dataset.name,
-            size: Number(btn.dataset.size || 0),
-            mime: btn.dataset.mime || '',
-            url: btn.dataset.url,
-          };
-        }).filter(Boolean);
-        if (!items.length) return;
-        window.notify?.(`Mengantrekan ${items.length} file untuk diunduh…`);
-        window.RuangDownloads?.enqueue(items);
-      });
-
-      search?.addEventListener('input', () => {
-        const q = search.value.trim().toLowerCase();
-        let visible = 0;
-        document.querySelectorAll('[data-dl-row]').forEach(row => {
-          const show = row.dataset.name.includes(q);
-          row.style.display = show ? '' : 'none';
-          if (show) visible++;
-        });
-        visibleEl.textContent = visible;
-        if (filterEmpty) filterEmpty.hidden = visible !== 0;
-        refresh();
-      });
-
-      refresh();
-    })();
-  </script>
 </x-user-layout>

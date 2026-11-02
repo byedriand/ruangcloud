@@ -57,11 +57,15 @@ class StorageNodeService
     /**
      * Respons unduhan dari replika sehat pertama; bila node mati / file hilang pindah ke replika lain
      * (failover). Mengembalikan null bila semua replika tidak dapat diakses.
+     *
+     * Semua replika diperiksa, bukan hanya yang berstatus synced: replika yang
+     * file-nya ternyata ada di disk dipulihkan statusnya menjadi synced. Satu
+     * pemeriksaan exists() yang meleset (mis. file masih dirakit/direplikasi)
+     * tidak lagi menandai replika failed secara permanen.
      */
     public function downloadResponse(StoredFile $file)
     {
         $replicas = $file->replicas()->with('node')
-            ->where('status', 'synced')
             ->orderByDesc('is_primary')
             ->get();
 
@@ -72,8 +76,11 @@ class StorageNodeService
 
             $disk = $this->disk($replica->node);
             if (! $disk->exists($file->stored_path)) {
-                $replica->update(['status' => 'failed', 'last_error' => 'File tidak ditemukan di node.']);
                 continue;
+            }
+
+            if ($replica->status !== 'synced') {
+                $replica->update(['status' => 'synced', 'last_error' => null]);
             }
 
             return $disk->download($file->stored_path, $file->name, [

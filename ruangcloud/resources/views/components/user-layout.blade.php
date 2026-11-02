@@ -23,11 +23,6 @@
       </button>
     </div>
 
-    {{-- Tombol Unggah Baru --}}
-    <button type="button" data-action="open-upload" class="mb-6 flex h-12 items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 text-sm font-extrabold text-white shadow-lg shadow-emerald-500/30 ring-1 ring-white/25 transition-all hover:from-emerald-400 hover:to-teal-300 active:scale-[0.98]">
-      <x-icon name="plus" class="h-5 w-5" /> Unggah berkas baru
-    </button>
-
     {{-- Menu Navigasi --}}
     <nav class="space-y-2">
       @foreach ($nav as $item)
@@ -43,7 +38,7 @@
     </nav>
 
     {{-- Widget Penyimpanan --}}
-    <div class="mt-auto rounded-2xl border border-white/15 bg-white/[0.07] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md">
+    <a href="{{ route('storage.index') }}" class="group mt-auto block rounded-2xl border p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md transition {{ $active === 'storage' ? 'border-emerald-300/40 bg-white/[0.12]' : 'border-white/15 bg-white/[0.07] hover:bg-white/[0.11]' }}">
       <div class="mb-2.5 flex items-center justify-between text-sm">
         <span class="text-xs font-bold uppercase tracking-wider text-slate-200">Penyimpanan</span>
         <span class="font-black text-emerald-400">{{ $storage['percent'] }}%</span>
@@ -55,7 +50,11 @@
       @if ($storage['percent'] > 85)
         <p class="mt-2 text-xs font-bold text-amber-300">Penyimpanan hampir penuh. Bersihkan file sampah.</p>
       @endif
-    </div>
+      <span class="mt-3 flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-wider text-emerald-300">
+        Lihat detail
+        <x-icon name="chevron" class="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+      </span>
+    </a>
 
     {{-- Profil Pengguna & Keluar --}}
     <button type="button" data-action="open-logout" title="Keluar dari akun" class="group mt-4 flex w-full items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.04] p-2 text-left backdrop-blur-md transition-colors hover:bg-white/10">
@@ -209,6 +208,30 @@
       <button type="button" data-action="confirm-move" class="mt-5 flex h-11 w-full items-center justify-center rounded-xl bg-emerald-600 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 hover:bg-emerald-500">
         Pindahkan ke folder ini
       </button>
+    </div>
+  </div>
+
+  {{-- Modal Informasi Folder --}}
+  <div id="folder-info-modal" hidden class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-[400px] glass-card rounded-3xl p-6 shadow-2xl md:p-7">
+      <div class="mb-5 flex items-start justify-between">
+        <div class="flex items-center gap-3.5">
+          <span class="folder-icon folder-mint flex h-11 w-11 items-center justify-center rounded-xl"><x-icon name="folder" class="h-6 w-6" /></span>
+          <div>
+            <h2 id="fi-name" class="max-w-[210px] truncate text-lg font-extrabold tracking-tight text-slate-900">Folder</h2>
+            <p class="text-xs font-medium text-slate-500">Informasi folder</p>
+          </div>
+        </div>
+        <button type="button" data-action="close-dialog" data-dialog="folder-info-modal" class="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+          <x-icon name="x" class="h-5 w-5" />
+        </button>
+      </div>
+      <dl class="space-y-3 text-sm">
+        <div class="flex items-center justify-between gap-4"><dt class="font-semibold text-slate-500">Pemilik</dt><dd id="fi-owner" class="font-bold text-slate-800">-</dd></div>
+        <div class="flex items-center justify-between gap-4"><dt class="font-semibold text-slate-500">Isi</dt><dd id="fi-contents" class="font-bold text-slate-800">-</dd></div>
+        <div class="flex items-center justify-between gap-4"><dt class="font-semibold text-slate-500">Ukuran total</dt><dd id="fi-size" class="font-bold text-slate-800">-</dd></div>
+        <div class="flex items-center justify-between gap-4"><dt class="font-semibold text-slate-500">Dibuat</dt><dd id="fi-created" class="font-bold text-slate-800">-</dd></div>
+      </dl>
     </div>
   </div>
 

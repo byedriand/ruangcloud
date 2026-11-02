@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\Folder;
 use App\Models\ShareLink;
 use App\Models\StoredFile;
 use App\Support\Fmt;
@@ -16,12 +17,13 @@ class ShareController extends Controller
 {
     public function index(Request $request)
     {
-        $shares = ShareLink::with(['file' => fn ($q) => $q->withTrashed()])
+        $shares = ShareLink::with(['file' => fn ($q) => $q->withTrashed(), 'folder'])
             ->where('user_id', $request->user()->id)
             ->latest()
             ->get()
             ->map(function (ShareLink $s) {
-                $trashed = $s->file?->trashed() ?? true;
+                $isFolder = $s->folder_id !== null;
+                $trashed = $isFolder ? false : ($s->file?->trashed() ?? true);
                 $status = match (true) {
                     $s->revoked_at !== null => 'Dicabut',
                     $s->isExpired()         => 'Kedaluwarsa',
@@ -31,9 +33,9 @@ class ShareController extends Controller
 
                 return [
                     'id'        => $s->id,
-                    'file'      => $s->file?->name ?? '(file dihapus)',
-                    'icon'      => $s->file ? Fmt::meta($s->file->name, $s->file->mime)[1] : 'file',
-                    'color'     => $s->file ? Fmt::meta($s->file->name, $s->file->mime)[2] : 'blue',
+                    'file'      => $isFolder ? ($s->folder?->name ?? '(folder dihapus)') : ($s->file?->name ?? '(file dihapus)'),
+                    'icon'      => $isFolder ? 'folder' : ($s->file ? Fmt::meta($s->file->name, $s->file->mime)[1] : 'file'),
+                    'color'     => $isFolder ? 'green' : ($s->file ? Fmt::meta($s->file->name, $s->file->mime)[2] : 'blue'),
                     'url'       => $s->url(),
                     'protected' => $s->password_hash !== null,
                     'expires'   => $s->expires_at ? $s->expires_at->copy()->locale('id')->translatedFormat('j M Y, H.i') : 'Tanpa batas',
@@ -64,6 +66,30 @@ class ShareController extends Controller
         ]);
 
         ActivityLog::record('share', Str::before($request->user()->name, ' ') . ' membuat tautan berbagi untuk "' . $file->name . '"', ['file_id' => $file->id]);
+
+        return response()->json(['url' => $share->url()]);
+    }
+
+    /** Buat tautan berbagi untuk sebuah folder (isi folder tampil di halaman publik). */
+    public function storeFolder(Request $request, Folder $folder): JsonResponse
+    {
+        abort_unless($folder->user_id === $request->user()->id, 403);
+
+        $data = $request->validate([
+            'password'   => ['nullable', 'string', 'min:4', 'max:100'],
+            'expires_in' => ['nullable', 'integer', 'in:1,7,30'],
+        ]);
+
+        $share = ShareLink::create([
+            'file_id'       => null,
+            'folder_id'     => $folder->id,
+            'user_id'       => $request->user()->id,
+            'token'         => Str::random(40),
+            'password_hash' => ! empty($data['password']) ? Hash::make($data['password']) : null,
+            'expires_at'    => ! empty($data['expires_in']) ? now()->addDays((int) $data['expires_in']) : null,
+        ]);
+
+        ActivityLog::record('share', Str::before($request->user()->name, ' ') . ' membuat tautan berbagi untuk folder "' . $folder->name . '"');
 
         return response()->json(['url' => $share->url()]);
     }

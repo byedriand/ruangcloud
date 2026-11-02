@@ -20,7 +20,7 @@
 {{-- Activity Summary --}}
 <div class="mb-5 grid grid-cols-2 gap-3 md:grid-cols-5">
   @foreach ($auditStats as $stat)
-    <div class="rounded-2xl glass-card p-4 text-center shadow-xs">
+    <div class="rounded-2xl glass-card stat-lift p-4 text-center shadow-xs">
       <span class="mx-auto mb-2.5 block h-1.5 w-9 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400"></span>
       <p class="text-xs font-bold uppercase tracking-wider text-[#64748b]">{{ $stat['label'] }}</p>
       <p class="mt-2 text-2xl font-black text-[#1a2320]">{{ $stat['count'] }}</p>

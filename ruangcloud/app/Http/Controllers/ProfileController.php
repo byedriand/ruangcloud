@@ -49,7 +49,7 @@ class ProfileController extends Controller
             ActivityLog::record('profile', $actor . ' mengubah email dari "' . $oldEmail . '" menjadi "' . $data['email'] . '"');
         }
 
-        return back()->with('success', 'Profil berhasil diperbarui.');
+        return back()->with('success', 'Profil berhasil diperbarui.')->with('open_panel', 'Profil');
     }
 
     /** Foto profil (disk public, folder avatars). */
@@ -75,7 +75,7 @@ class ProfileController extends Controller
 
         ActivityLog::record('avatar', Str::before($user->name, ' ') . ' memperbarui foto profil');
 
-        return back()->with('success', 'Foto profil berhasil diperbarui.');
+        return back()->with('success', 'Foto profil berhasil diperbarui.')->with('open_panel', 'Profil');
     }
 
     public function destroyAvatar()
@@ -89,7 +89,7 @@ class ProfileController extends Controller
             ActivityLog::record('avatar', Str::before($user->name, ' ') . ' menghapus foto profil');
         }
 
-        return back()->with('success', 'Foto profil dihapus.');
+        return back()->with('success', 'Foto profil dihapus.')->with('open_panel', 'Profil');
     }
 
     /** Ganti kata sandi (wajib tahu sandi lama). */
@@ -111,6 +111,6 @@ class ProfileController extends Controller
 
         ActivityLog::record('password', Str::before($user->name, ' ') . ' mengubah kata sandi');
 
-        return back()->with('success', 'Kata sandi berhasil diubah.');
+        return back()->with('success', 'Kata sandi berhasil diubah.')->with('open_panel', 'Profil');
     }
 }

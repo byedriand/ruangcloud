@@ -33,7 +33,7 @@
         <span class="text-right">Aksi</span>
       </div>
       @foreach ($files as $file)
-        <div data-file-name="{{ mb_strtolower($file['name']) }}" class="group grid grid-cols-[minmax(280px,1.8fr)_1fr_120px_56px] items-center gap-4 border-b border-slate-100/80 px-6 py-3.5 last:border-0 hover:bg-emerald-50/60 transition-colors">
+        <div data-file-name="{{ mb_strtolower($file['name']) }}" draggable="true" data-drag-file="{{ $file['id'] }}" class="group grid grid-cols-[minmax(280px,1.8fr)_1fr_120px_56px] items-center gap-4 border-b border-slate-100/80 px-6 py-3.5 last:border-0 hover:bg-emerald-50/60 transition-colors">
           <button type="button"
             data-action="preview-file"
             data-file-id="{{ $file['id'] }}"
@@ -73,7 +73,7 @@
   {{-- Tampilan Grid --}}
   <div id="view-grid" hidden class="grid grid-cols-2 gap-4 p-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
     @foreach ($files as $file)
-      <div data-file-name="{{ mb_strtolower($file['name']) }}" class="group relative rounded-2xl glass-card p-4.5 transition-all hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md hover:shadow-emerald-900/5">
+      <div data-file-name="{{ mb_strtolower($file['name']) }}" draggable="true" data-drag-file="{{ $file['id'] }}" class="group relative rounded-2xl glass-card p-4.5 transition-all hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md hover:shadow-emerald-900/5">
         <div class="absolute right-2 top-2 z-10"><x-file-menu :file="$file" /></div>
         <button type="button"
           data-action="preview-file"

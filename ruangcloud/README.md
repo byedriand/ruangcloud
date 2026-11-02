@@ -280,9 +280,9 @@ Seluruh akun demo memiliki kata sandi default: **`ruangcloud2026`**
 | Role | Email | Password | Kapasitas Kuota | Akses Halaman |
 |:---|:---|:---:|:---:|:---|
 | **Administrator** | `admin@ruangcloud.id` | `ruangcloud2026` | 1.000 GB | `/admin` (Cluster Dashboard, Nodes Health, Audit Log) |
-| **Pengguna** | `naufal@ruangcloud.id` | `ruangcloud2026` | 100 GB | `/dashboard` (Manajemen Berkas, Upload, Berbagi) |
-| **Pengguna** | `sona@ruangcloud.id` | `ruangcloud2026` | 100 GB | `/dashboard` (Akun Klien) |
-| **Pengguna** | `ghea@ruangcloud.id` | `ruangcloud2026` | 100 GB | `/dashboard` |
+| **Pengguna** | `naufal@ruangcloud.id` | `ruangcloud2026` | 5 GB | `/dashboard` (Manajemen Berkas, Upload, Berbagi) |
+| **Pengguna** | `sona@ruangcloud.id` | `ruangcloud2026` | 5 GB | `/dashboard` (Akun Klien) |
+| **Pengguna** | `ghea@ruangcloud.id` | `ruangcloud2026` | 5 GB | `/dashboard` |
 
 ---
 

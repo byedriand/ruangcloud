@@ -29,17 +29,17 @@
 
 {{-- Stats Mini --}}
 <div class="mb-6 grid grid-cols-3 gap-4">
-  <div class="rounded-2xl glass-card p-5 shadow-sm">
+  <div class="rounded-2xl glass-card stat-lift p-5 shadow-sm">
     <div class="flex items-center gap-3"><div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/30"><x-icon name="users" class="h-5 w-5" /></div><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Pengguna</p></div>
     <p class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">{{ $allUsers->count() }}</p>
     <p class="mt-1 text-xs text-slate-500">+{{ $newUsersThisMonth }} bulan ini</p>
   </div>
-  <div class="rounded-2xl glass-card p-5 shadow-sm">
+  <div class="rounded-2xl glass-card stat-lift p-5 shadow-sm">
     <div class="flex items-center gap-3"><div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 to-cyan-500 text-white shadow-lg shadow-teal-500/30"><x-icon name="check" class="h-5 w-5" /></div><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Pengguna Aktif</p></div>
     <p class="mt-2 text-3xl font-extrabold tracking-tight text-emerald-600">{{ $allUsers->where('is_active', true)->count() }}</p>
     <p class="mt-1 text-xs text-slate-500">{{ $allUsers->where('is_active', false)->count() }} nonaktif</p>
   </div>
-  <div class="rounded-2xl glass-card p-5 shadow-sm">
+  <div class="rounded-2xl glass-card stat-lift p-5 shadow-sm">
     <div class="flex items-center gap-3"><div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-400 to-purple-500 text-white shadow-lg shadow-violet-500/30"><x-icon name="lock" class="h-5 w-5" /></div><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Administrator</p></div>
     <p class="mt-2 text-3xl font-extrabold tracking-tight text-purple-600">{{ $allUsers->where('role', 'admin')->count() }}</p>
     <p class="mt-1 text-xs text-slate-500">{{ $allUsers->where('role', 'user')->count() }} pengguna biasa</p>

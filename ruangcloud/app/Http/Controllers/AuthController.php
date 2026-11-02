@@ -51,15 +51,14 @@ class AuthController extends Controller
             'password'     => Hash::make($data['password']),
             'role'         => 'user',
             'is_active'    => true,
-            'quota_bytes'  => 100 * 1024 ** 3, // 100 GB
+            'quota_bytes'  => 5 * 1024 ** 3, // 5 GB
         ]);
 
-        ActivityLog::record('login', Str::before($user->name, ' ') . ' mendaftar dan masuk ke sistem', [], $user->id);
+        ActivityLog::record('login', Str::before($user->name, ' ') . ' mendaftar akun baru', [], $user->id);
 
-        Auth::login($user);
-        $request->session()->regenerate();
-
-        return redirect()->route('dashboard')->with('success', 'Akun berhasil dibuat! Selamat datang di RuangCloud.');
+        // Setelah daftar TIDAK langsung masuk: arahkan ke halaman login
+        // membawa pesan sukses (popup beranimasi tampil di sana).
+        return redirect()->route('login')->with('success', 'Akun berhasil dibuat! Silakan masuk dengan akun barumu untuk mulai menggunakan RuangCloud.');
     }
 
     public function login(Request $request)

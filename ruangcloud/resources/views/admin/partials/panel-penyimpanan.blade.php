@@ -23,7 +23,7 @@
   </div>
   <div class="mb-4 flex items-end justify-between">
     <div>
-      <p class="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">{{ $storageUsedFmt }}</p>
+      <p class="bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-600 bg-clip-text text-3xl font-extrabold tracking-tight text-transparent md:text-4xl">{{ $storageUsedFmt }}</p>
       <p class="mt-1 text-xs text-slate-500">dari <span class="font-bold text-slate-700">{{ $storageCapacityFmt }}</span> total kapasitas terdistribusi</p>
     </div>
     <p class="text-3xl font-extrabold text-emerald-600">{{ $storagePercent }}%</p>
@@ -37,7 +37,7 @@
 {{-- Node Cards --}}
 <div class="mb-6 grid gap-5 md:grid-cols-3">
   @foreach ($allNodesDetail as $node)
-    <article class="rounded-3xl glass-card p-6 shadow-sm transition hover:shadow-md">
+    <article class="rounded-3xl glass-card stat-lift p-6 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/30">
           <x-icon name="archive" class="h-6 w-6" />

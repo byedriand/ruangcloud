@@ -107,11 +107,11 @@
       <label class="block">
         <span class="mb-1.5 block text-sm font-bold text-slate-700">Nama pengguna</span>
         <div class="relative">
-          <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-600">
-            <x-icon name="user" class="h-4.5 w-4.5" />
+          <span class="pointer-events-none absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-500/30">
+            <x-icon name="user" class="h-4 w-4" />
           </span>
           <input type="text" name="name" value="{{ old('name', $user->name) }}" required maxlength="255"
-                 class="h-12 w-full rounded-xl border border-white/70 bg-white/70 pl-11 pr-4 backdrop-blur text-sm text-slate-800 transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
+                 class="h-12 w-full rounded-xl border border-white/70 bg-white/70 pl-12 pr-4 backdrop-blur text-sm text-slate-800 transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
         </div>
         @error('name')
           <span class="mt-1.5 block text-xs font-semibold text-red-500">{{ $message }}</span>
@@ -120,11 +120,11 @@
       <label class="block">
         <span class="mb-1.5 block text-sm font-bold text-slate-700">Email</span>
         <div class="relative">
-          <span class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-600">
-            <x-icon name="mail" class="h-4.5 w-4.5" />
+          <span class="pointer-events-none absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-500/30">
+            <x-icon name="mail" class="h-4 w-4" />
           </span>
           <input type="email" name="email" value="{{ old('email', $user->email) }}" required maxlength="255"
-                 class="h-12 w-full rounded-xl border border-white/70 bg-white/70 pl-11 pr-4 backdrop-blur text-sm text-slate-800 transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
+                 class="h-12 w-full rounded-xl border border-white/70 bg-white/70 pl-12 pr-4 backdrop-blur text-sm text-slate-800 transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
         </div>
         @error('email')
           <span class="mt-1.5 block text-xs font-semibold text-red-500">{{ $message }}</span>
@@ -155,8 +155,9 @@
     <label class="block sm:max-w-md">
       <span class="mb-1.5 block text-sm font-bold text-slate-700">Kata sandi saat ini</span>
       <div class="relative">
+        <span class="pointer-events-none absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-500/30"><x-icon name="lock" class="h-4 w-4" /></span>
         <input type="password" id="pw-current" name="current_password" required autocomplete="current-password"
-               class="h-12 w-full rounded-xl border border-white/70 bg-white/70 px-4 pr-12 backdrop-blur text-sm text-slate-800 transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
+               class="h-12 w-full rounded-xl border border-white/70 bg-white/70 pl-12 pr-12 backdrop-blur text-sm text-slate-800 transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
         <button type="button" data-toggle-pw="pw-current" aria-label="Tampilkan kata sandi" class="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-500 transition hover:text-emerald-600">
           <span class="pw-eye"><x-icon name="eye" class="h-5 w-5" /></span>
           <span class="pw-eye-off" hidden><x-icon name="eye-off" class="h-5 w-5" /></span>
@@ -172,8 +173,9 @@
         <label class="block">
           <span class="mb-1.5 block text-sm font-bold text-slate-700">Kata sandi baru</span>
           <div class="relative">
+            <span class="pointer-events-none absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-500/30"><x-icon name="lock" class="h-4 w-4" /></span>
             <input type="password" id="pw-new" name="password" required autocomplete="new-password"
-                   class="h-12 w-full rounded-xl border border-white/70 bg-white/70 px-4 pr-12 backdrop-blur text-sm text-slate-800 transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
+                   class="h-12 w-full rounded-xl border border-white/70 bg-white/70 pl-12 pr-12 backdrop-blur text-sm text-slate-800 transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
             <button type="button" data-toggle-pw="pw-new" aria-label="Tampilkan kata sandi" class="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-500 transition hover:text-emerald-600">
               <span class="pw-eye"><x-icon name="eye" class="h-5 w-5" /></span>
               <span class="pw-eye-off" hidden><x-icon name="eye-off" class="h-5 w-5" /></span>
@@ -198,8 +200,9 @@
       <label class="block">
         <span class="mb-1.5 block text-sm font-bold text-slate-700">Konfirmasi kata sandi baru</span>
         <div class="relative">
+          <span class="pointer-events-none absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-500/30"><x-icon name="lock" class="h-4 w-4" /></span>
           <input type="password" id="pw-confirm" name="password_confirmation" required autocomplete="new-password"
-                 class="h-12 w-full rounded-xl border border-white/70 bg-white/70 px-4 pr-12 backdrop-blur text-sm text-slate-800 transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
+                 class="h-12 w-full rounded-xl border border-white/70 bg-white/70 pl-12 pr-12 backdrop-blur text-sm text-slate-800 transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10">
           <button type="button" data-toggle-pw="pw-confirm" aria-label="Tampilkan kata sandi" class="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-500 transition hover:text-emerald-600">
             <span class="pw-eye"><x-icon name="eye" class="h-5 w-5" /></span>
             <span class="pw-eye-off" hidden><x-icon name="eye-off" class="h-5 w-5" /></span>

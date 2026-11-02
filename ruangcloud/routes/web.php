@@ -4,12 +4,14 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicShareController;
 use App\Http\Controllers\ShareController;
+use App\Http\Controllers\StorageController;
 use App\Http\Controllers\TrashController;
 use App\Http\Controllers\UploadController;
 use App\Http\Middleware\EnsureRole;
@@ -28,6 +30,8 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::get('/s/{token}', [PublicShareController::class, 'show'])->name('share.show');
     Route::post('/s/{token}', [PublicShareController::class, 'unlock'])->name('share.unlock');
     Route::get('/s/{token}/download', [PublicShareController::class, 'download'])->name('share.download');
+    Route::get('/s/{token}/zip', [PublicShareController::class, 'downloadAll'])->name('share.zip');
+    Route::get('/s/{token}/file/{file}', [PublicShareController::class, 'downloadFile'])->name('share.file');
 });
 
 Route::middleware('auth')->group(function () {
@@ -39,6 +43,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/downloads', [FileController::class, 'downloads'])->name('files.downloads');
         Route::get('/shared', [ShareController::class, 'index'])->name('shares.index');
         Route::get('/activity', [ActivityController::class, 'index'])->name('activity.index');
+        Route::get('/penyimpanan', [StorageController::class, 'index'])->name('storage.index');
         Route::get('/trash', [TrashController::class, 'index'])->name('trash.index');
     });
 
@@ -90,10 +95,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/folders', [FolderController::class, 'store'])->name('folders.store');
     Route::patch('/folders/{folder}', [FolderController::class, 'rename'])->name('folders.rename');
     Route::delete('/folders/{folder}', [FolderController::class, 'destroy'])->name('folders.destroy');
+    Route::get('/folders/{folder}/download', [FolderController::class, 'download'])->name('folders.download');
+    Route::post('/folders/{folder}/move', [FolderController::class, 'move'])->name('folders.move');
+    Route::post('/folders/{folder}/share', [ShareController::class, 'storeFolder'])->name('folders.share');
 
     // Tautan berbagi & sampah
     Route::delete('/shares/{share}', [ShareController::class, 'destroy'])->name('shares.destroy');
     Route::delete('/shares/{share}/purge', [ShareController::class, 'purge'])->name('shares.purge');
+    Route::post('/downloads/check', [DownloadController::class, 'check'])->name('downloads.check');
+    Route::post('/downloads/record', [DownloadController::class, 'store'])->name('downloads.store');
+    Route::delete('/downloads/{record}', [DownloadController::class, 'destroy'])->name('downloads.destroy');
     Route::post('/trash/{id}/restore', [TrashController::class, 'restore'])->name('trash.restore');
     Route::delete('/trash/{id}', [TrashController::class, 'purge'])->name('trash.purge');
     Route::delete('/trash', [TrashController::class, 'empty'])->name('trash.empty');

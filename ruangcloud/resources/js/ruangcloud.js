@@ -203,7 +203,9 @@ function hideAllPreviewSlots() {
         .forEach(id => { const el = $(`#${id}`); if (el) el.hidden = true; });
 }
 
+let previewFile = null;
 async function openPreview(fileId, name, mime, previewUrl, downloadUrl, updated = '') {
+    previewFile = { id: Number(fileId), name, mime, size: 0, url: downloadUrl };
     const modal = $('#preview-modal');
     if (!modal) return;
 
@@ -257,6 +259,16 @@ async function openPreview(fileId, name, mime, previewUrl, downloadUrl, updated 
         showUnsupported(downloadUrl);
     }
 }
+
+// Unduh dari pratinjau ikut jalur terpantau (progres + catatan selesai).
+['preview-download', 'preview-unsupported-dl'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('click', (event) => {
+        if (!previewFile) return;
+        event.preventDefault();
+        beginDownload({ ...previewFile });
+        closePreview();
+    });
+});
 
 function showUnsupported(downloadUrl) {
     const el = $('#preview-unsupported');
@@ -381,24 +393,46 @@ async function trashFile(id) {
     run(() => api(`/files/${id}`, { method: 'DELETE' }), 'File dipindahkan ke sampah');
 }
 
-let moveFileId = null;
+let moveTarget = { type: 'file', id: null };
 function openMove(id) {
-    moveFileId = id;
+    moveTarget = { type: 'file', id };
     $('#move-folder').value = '';
+    $('#move-modal h2').textContent = 'Pindahkan file';
+    $('#move-modal').hidden = false;
+}
+function openMoveFolder(id) {
+    moveTarget = { type: 'folder', id };
+    $('#move-folder').value = '';
+    $('#move-modal h2').textContent = 'Pindahkan folder';
     $('#move-modal').hidden = false;
 }
 function confirmMove() {
     const folderId = $('#move-folder').value;
     $('#move-modal').hidden = true;
-    run(
-        () => api(`/files/${moveFileId}/move`, { method: 'POST', json: { folder_id: folderId ? Number(folderId) : null } }),
-        'File dipindahkan',
-    );
+    if (moveTarget.type === 'folder') {
+        run(
+            () => api(`/folders/${moveTarget.id}/move`, { method: 'POST', json: { parent_id: folderId ? Number(folderId) : null } }),
+            'Folder dipindahkan',
+        );
+    } else {
+        run(
+            () => api(`/files/${moveTarget.id}/move`, { method: 'POST', json: { folder_id: folderId ? Number(folderId) : null } }),
+            'File dipindahkan',
+        );
+    }
 }
 
-let shareFileId = null;
+let shareTarget = { type: 'file', id: null };
 function openShare(id, name) {
-    shareFileId = id;
+    shareTarget = { type: 'file', id };
+    $('#share-file-name').textContent = name;
+    $('#share-password').value = '';
+    $('#share-form').hidden = false;
+    $('#share-result').hidden = true;
+    $('#share-modal').hidden = false;
+}
+function openShareFolder(id, name) {
+    shareTarget = { type: 'folder', id };
     $('#share-file-name').textContent = name;
     $('#share-password').value = '';
     $('#share-form').hidden = false;
@@ -409,7 +443,7 @@ async function createShare() {
     const password = $('#share-password').value.trim();
     const expiry = $('#share-expiry').value;
     try {
-        const data = await api(`/files/${shareFileId}/share`, {
+        const data = await api(shareTarget.type === 'folder' ? `/folders/${shareTarget.id}/share` : `/files/${shareTarget.id}/share`, {
             method: 'POST',
             json: { password: password || null, expires_in: expiry ? Number(expiry) : null },
         });
@@ -428,6 +462,37 @@ async function copyText(text) {
     } catch {
         await promptDialog({ title: 'Salin tautan', message: 'Salin tautan di bawah ini secara manual.', label: 'Tautan berbagi', value: text, okText: 'Selesai' });
     }
+}
+
+// Klik Unduh dari halaman mana pun: unduhan dijalankan di halaman Download
+// agar progresnya langsung terlihat di sana.
+function beginDownload(item) {
+    if (document.getElementById('dl-history')) {
+        Downloads.start(item);
+        return;
+    }
+    try { sessionStorage.setItem('rc-pending-download', JSON.stringify(item)); } catch { /* abaikan */ }
+    window.location.href = '/downloads';
+}
+
+// Setibanya di halaman Download, jalankan unduhan yang tadi diklik.
+(() => {
+    if (!document.getElementById('dl-history')) return;
+    let raw = null;
+    try {
+        raw = sessionStorage.getItem('rc-pending-download');
+        if (raw) sessionStorage.removeItem('rc-pending-download');
+    } catch { /* abaikan */ }
+    if (!raw) return;
+    try {
+        const item = JSON.parse(raw);
+        setTimeout(() => Downloads.start(item), 350);
+    } catch { /* abaikan */ }
+})();
+
+async function deleteDownloadRecord(id) {
+    if (!await confirmDialog({ title: 'Hapus dari riwayat unduhan?', message: 'Catatan unduhan ini dihapus dari daftar. Setelah itu file bisa diunduh lagi.', okText: 'Hapus', danger: true })) return;
+    run(() => api(`/downloads/${id}`, { method: 'DELETE' }), 'Riwayat unduhan dihapus');
 }
 
 async function revokeShare(id) {
@@ -520,7 +585,7 @@ document.addEventListener('click', (event) => {
         case 'add-folder':    addFolder(target.dataset.parentId); break;
         case 'toggle-upload': toggleUpload(target.dataset.cid); break;
         case 'download-file':
-            Downloads.start({
+            beginDownload({
                 id: Number(target.dataset.fileId),
                 name: target.dataset.name,
                 size: Number(target.dataset.size || 0),
@@ -530,6 +595,7 @@ document.addEventListener('click', (event) => {
             break;
         case 'dl-toggle': Downloads.toggle(target.dataset.id); break;
         case 'dl-cancel': Downloads.cancel(target.dataset.id); break;
+        case 'delete-download-record': deleteDownloadRecord(target.dataset.recordId); break;
         case 'cancel-upload': cancelUpload(target.dataset.cid); break;
         case 'delete-file':   trashFile(target.dataset.fileId); break;
         case 'rename-file':
@@ -545,8 +611,11 @@ document.addEventListener('click', (event) => {
         case 'rename-folder': renameFolder(target.dataset.folderId, target.dataset.name); break;
         case 'delete-folder': deleteFolder(target.dataset.folderId, target.dataset.redirect); break;
         case 'move-file':     openMove(target.dataset.fileId); break;
+        case 'move-folder':   openMoveFolder(target.dataset.folderId); break;
         case 'confirm-move':  confirmMove(); break;
         case 'share-file':    openShare(target.dataset.fileId, target.dataset.name); break;
+        case 'share-folder':  openShareFolder(target.dataset.folderId, target.dataset.name); break;
+        case 'folder-info':   openFolderInfo(target.dataset); break;
         case 'create-share':  createShare(); break;
         case 'copy-share':    copyText($('#share-url').value); break;
         case 'copy-link':     copyText(target.dataset.url); break;
@@ -568,7 +637,9 @@ document.addEventListener('click', (event) => {
             break;
         case 'close-preview': closePreview(); break;
         case 'toggle-password': {
-            const input = $('#password');
+            const wrap = target.closest('div');
+            const input = (wrap && wrap.querySelector('input')) || $('#password');
+            if (!input) break;
             const show = input.type === 'password';
             input.type = show ? 'text' : 'password';
             target.textContent = show ? 'Sembunyikan' : 'Lihat';
@@ -644,3 +715,142 @@ renderFiles();
 
 // Pulihkan unggahan yang masih berjalan/terjeda dari halaman sebelumnya (bila ada).
 restoreUploads();
+
+// -- Halaman register: meter kekuatan kata sandi, cek kecocokan, spinner --
+// Diikat lewat bundle ini (jalur yang sama dengan toggle Lihat yang terbukti
+// jalan) karena handler inline pada view register tidak berjalan di semua
+// lingkungan. Hanya aktif bila elemen-elemen register ada di halaman.
+(function () {
+    const pw = document.getElementById('password');
+    const barsEl = document.getElementById('strength-bars');
+    if (!pw || !barsEl) return;
+
+    const pw2 = document.getElementById('password_confirmation');
+    const bars = ['sb1', 'sb2', 'sb3', 'sb4'].map((id) => document.getElementById(id));
+    const label = document.getElementById('strength-label');
+    const matchLabel = document.getElementById('match-label');
+    const colors = ['bg-red-400', 'bg-orange-400', 'bg-amber-400', 'bg-emerald-500'];
+    const labels = ['Sangat lemah', 'Lemah', 'Cukup', 'Kuat'];
+    const labelColors = ['text-red-500', 'text-orange-500', 'text-amber-600', 'text-emerald-600'];
+
+    function checkMatch() {
+        if (!pw2 || !matchLabel) return;
+        if (pw2.value.length === 0) { matchLabel.classList.add('hidden'); return; }
+        matchLabel.classList.remove('hidden');
+        if (pw.value === pw2.value) {
+            matchLabel.textContent = 'Kata sandi cocok';
+            matchLabel.className = 'mt-1.5 text-xs font-bold text-emerald-600';
+        } else {
+            matchLabel.textContent = 'Kata sandi tidak cocok';
+            matchLabel.className = 'mt-1.5 text-xs font-bold text-red-500';
+        }
+    }
+
+    function checkStrength() {
+        const val = pw.value;
+        let score = 0;
+        if (val.length >= 8) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+        bars.forEach((b, i) => {
+            if (b) b.className = 'h-1.5 flex-1 rounded-full transition-all ' + (i < score ? colors[score - 1] : 'bg-slate-200');
+        });
+        if (label) {
+            if (val.length === 0) {
+                label.textContent = 'Masukkan kata sandi untuk melihat kekuatannya';
+                label.className = 'mt-1.5 text-xs text-[#64748b]';
+            } else {
+                label.textContent = labels[score - 1] || 'Sangat lemah';
+                label.className = 'mt-1.5 text-xs font-bold ' + (labelColors[score - 1] || 'text-red-500');
+            }
+        }
+        checkMatch();
+    }
+
+    pw.addEventListener('input', checkStrength);
+    if (pw2) pw2.addEventListener('input', checkMatch);
+    checkStrength();
+
+    const form = document.getElementById('register-form');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            const terms = document.getElementById('terms');
+            if (terms && !terms.checked) {
+                e.preventDefault();
+                terms.closest('label').classList.add('border-red-400', 'bg-red-50/50');
+                setTimeout(() => terms.closest('label').classList.remove('border-red-400', 'bg-red-50/50'), 2000);
+                return;
+            }
+            const btnText = document.getElementById('btn-text');
+            if (btnText) btnText.classList.add('invisible');
+            const chev = document.querySelector('.group svg.h-4');
+            if (chev) chev.classList.add('invisible');
+            const spinner = document.getElementById('btn-spinner');
+            if (spinner) spinner.classList.remove('hidden');
+            const submitBtn = document.getElementById('submit-btn');
+            if (submitBtn) submitBtn.disabled = true;
+        });
+    }
+})();
+
+/* ---------- Informasi folder ---------- */
+function openFolderInfo(d) {
+    $('#fi-name').textContent = d.name || '-';
+    $('#fi-owner').textContent = d.owner || '-';
+    $('#fi-contents').textContent = `${d.files || 0} file, ${d.folders || 0} subfolder`;
+    $('#fi-size').textContent = d.size || '-';
+    $('#fi-created').textContent = d.created || '-';
+    $('#folder-info-modal').hidden = false;
+}
+
+/* ---------- Seret & lepas: pindahkan file / folder ke folder lain ---------- */
+let dragPayload = null;
+
+document.addEventListener('dragstart', (event) => {
+    const fileEl = event.target.closest?.('[data-drag-file]');
+    const folderEl = event.target.closest?.('[data-drag-folder]');
+    const el = fileEl || folderEl;
+    if (!el) return;
+    dragPayload = fileEl
+        ? { kind: 'file', id: Number(fileEl.dataset.dragFile) }
+        : { kind: 'folder', id: Number(folderEl.dataset.dragFolder) };
+    event.dataTransfer.effectAllowed = 'move';
+    try { event.dataTransfer.setData('text/plain', JSON.stringify(dragPayload)); } catch { /* abaikan */ }
+    el.classList.add('rc-dragging');
+});
+
+document.addEventListener('dragend', () => {
+    dragPayload = null;
+    $$('.rc-dragging').forEach((el) => el.classList.remove('rc-dragging'));
+    $$('[data-drop-folder]').forEach((el) => el.classList.remove('drop-active'));
+});
+
+document.addEventListener('dragover', (event) => {
+    if (!dragPayload) return;
+    const target = event.target.closest?.('[data-drop-folder]');
+    if (!target) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    $$('[data-drop-folder]').forEach((el) => el.classList.toggle('drop-active', el === target));
+});
+
+document.addEventListener('drop', (event) => {
+    const target = event.target.closest?.('[data-drop-folder]');
+    if (!target || !dragPayload) return;
+    event.preventDefault();
+    const targetId = target.dataset.dropFolder === 'root' ? null : Number(target.dataset.dropFolder);
+    const payload = dragPayload;
+    dragPayload = null;
+    target.classList.remove('drop-active');
+
+    if (payload.kind === 'folder' && targetId === payload.id) {
+        notify('Folder tidak bisa dipindahkan ke dirinya sendiri');
+        return;
+    }
+    if (payload.kind === 'file') {
+        run(() => api(`/files/${payload.id}/move`, { method: 'POST', json: { folder_id: targetId } }), 'File dipindahkan');
+    } else {
+        run(() => api(`/folders/${payload.id}/move`, { method: 'POST', json: { parent_id: targetId } }), 'Folder dipindahkan');
+    }
+});

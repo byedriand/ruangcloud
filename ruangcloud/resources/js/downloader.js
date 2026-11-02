@@ -30,6 +30,33 @@ const formatEta = (seconds) => {
     return `${Math.floor(seconds / 3600)} jam ${Math.round((seconds % 3600) / 60)} menit`;
 };
 
+const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+async function isRecorded(fileId) {
+    try {
+        const response = await fetch('/downloads/check', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken() },
+            body: JSON.stringify({ file_id: fileId }),
+        });
+        if (!response.ok) return false;
+        const data = await response.json();
+        return !!data.downloaded;
+    } catch {
+        return false;
+    }
+}
+
+function recordDownload(fileId) {
+    fetch('/downloads/record', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken() },
+        body: JSON.stringify({ file_id: fileId }),
+    }).catch(() => {});
+}
+
 const downloads = new Map(); // fileId -> state
 const queue = [];
 let queueRunning = false;
@@ -117,17 +144,9 @@ async function runDownload(dl) {
     let parts = null;
 
     try {
-        // Mode tulis langsung ke disk (Chrome/Edge) — hanya dari klik langsung, bukan antrean.
-        if (!dl.fromQueue && window.showSaveFilePicker) {
-            try {
-                const handle = await window.showSaveFilePicker({ suggestedName: dl.name });
-                writable = await handle.createWritable();
-            } catch {
-                return cleanup(dl, false); // pengguna membatalkan dialog simpan
-            }
-        } else {
-            parts = [];
-        }
+        // Tanpa dialog simpan: potongan ditampung lalu disimpan otomatis ke folder
+        // Unduhan browser saat selesai, agar alur unduhan selalu tampil di halaman Download.
+        parts = [];
 
         const response = await fetch(dl.url, { credentials: 'same-origin', signal: dl.controller.signal });
         if (!response.ok || !response.body) throw new Error(`Unduhan gagal (HTTP ${response.status})`);
@@ -174,6 +193,10 @@ async function runDownload(dl) {
 
         setState(dl, 'done');
         notify(`Unduhan selesai: ${dl.name}`);
+        recordDownload(dl.id);
+        if (document.getElementById('dl-history')) {
+            setTimeout(() => window.location.reload(), 1500);
+        }
         setTimeout(() => cleanup(dl, true), 6000);
     } catch (error) {
         if (dl.cancelled) return cleanup(dl, false);
@@ -192,7 +215,19 @@ function cleanup(dl, keepRow) {
     advanceQueue();
 }
 
-function start(item, { fromQueue = false } = {}) {
+async function start(item, options = {}) {
+    if (downloads.has(item.id)) {
+        notify('File ini sedang diunduh');
+        return;
+    }
+    if (await isRecorded(item.id)) {
+        notify('File ini sudah selesai diunduh dan tidak bisa diunduh lagi. Hapus dari riwayat di halaman Download bila ingin mengunduh ulang.');
+        return;
+    }
+    startNow(item, options);
+}
+
+function startNow(item, { fromQueue = false } = {}) {
     if (downloads.has(item.id)) {
         notify('File ini sedang diunduh');
         return;

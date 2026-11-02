@@ -8,28 +8,28 @@
 
 {{-- Stats --}}
 <div class="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-  <div class="rounded-2xl glass-card p-5 shadow-sm">
+  <div class="rounded-2xl glass-card stat-lift p-5 shadow-sm">
     <div class="mb-3.5 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/30">
       <x-icon name="upload" class="h-5 w-5" />
     </div>
     <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Sesi Aktif</p>
     <p class="mt-1.5 text-3xl font-extrabold tracking-tight text-slate-900">{{ $uploadStats['active'] }}</p>
   </div>
-  <div class="rounded-2xl glass-card p-5 shadow-sm">
+  <div class="rounded-2xl glass-card stat-lift p-5 shadow-sm">
     <div class="mb-3.5 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-400 to-purple-500 text-white shadow-lg shadow-violet-500/30">
       <x-icon name="clock" class="h-5 w-5" />
     </div>
     <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Assembling</p>
     <p class="mt-1.5 text-3xl font-extrabold tracking-tight text-slate-900">{{ $uploadStats['assembling'] }}</p>
   </div>
-  <div class="rounded-2xl glass-card p-5 shadow-sm">
+  <div class="rounded-2xl glass-card stat-lift p-5 shadow-sm">
     <div class="mb-3.5 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 text-white shadow-lg shadow-sky-500/30">
       <x-icon name="file" class="h-5 w-5" />
     </div>
     <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Selesai Hari Ini</p>
     <p class="mt-1.5 text-3xl font-extrabold tracking-tight text-slate-900">{{ $uploadStats['completedToday'] }}</p>
   </div>
-  <div class="rounded-2xl glass-card p-5 shadow-sm">
+  <div class="rounded-2xl glass-card stat-lift p-5 shadow-sm">
     <div class="mb-3.5 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-lg shadow-amber-500/30">
       <x-icon name="archive" class="h-5 w-5" />
     </div>

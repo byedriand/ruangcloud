@@ -13,9 +13,9 @@
     <button type="button" data-action="preview-file" data-file-id="{{ $file['id'] }}" data-name="{{ $file['name'] }}" data-mime="{{ $file['mime'] }}" data-preview-url="{{ $file['previewUrl'] }}" data-download-url="{{ $file['downloadUrl'] }}" data-updated="{{ $file['updatedDate'] ?? '' }}" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-sky-50">
       <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600"><x-icon name="image" class="h-4 w-4" /></span> Pratinjau
     </button>
-    <a href="{{ $file['downloadUrl'] }}" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition hover:bg-emerald-50">
+    <button type="button" data-action="download-file" data-file-id="{{ $file['id'] }}" data-name="{{ $file['name'] }}" data-size="0" data-mime="{{ $file['mime'] }}" data-url="{{ $file['downloadUrl'] }}" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-emerald-50">
       <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600"><x-icon name="download" class="h-4 w-4" /></span> Unduh berkas
-    </a>
+    </button>
     <button type="button" data-action="share-file" data-file-id="{{ $file['id'] }}" data-name="{{ $file['name'] }}" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-violet-50">
       <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-violet-50 text-violet-600"><x-icon name="link" class="h-4 w-4" /></span> Bagikan tautan
     </button>

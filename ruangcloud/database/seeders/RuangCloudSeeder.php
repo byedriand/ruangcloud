@@ -15,10 +15,10 @@ class RuangCloudSeeder extends Seeder
 
         $users = [
             ['Administrator',  'admin@ruangcloud.id',  'admin', 1000, true],
-            ['Naufal Azmi',    'naufal@ruangcloud.id', 'user',  100,  true],
-            ['Sona Mardiana',  'sona@ruangcloud.id',   'user',  100,  true],
-            ['Anggraeni Ghea', 'ghea@ruangcloud.id',   'user',  100,  true],
-            ['Muhamad Aziz',   'aziz@ruangcloud.id',   'user',  100,  false],
+            ['Naufal Azmi',    'naufal@ruangcloud.id', 'user',  5,    true],
+            ['Sona Mardiana',  'sona@ruangcloud.id',   'user',  5,    true],
+            ['Anggraeni Ghea', 'ghea@ruangcloud.id',   'user',  5,    true],
+            ['Muhamad Aziz',   'aziz@ruangcloud.id',   'user',  5,    false],
         ];
 
         foreach ($users as [$name, $email, $role, $quotaGb, $active]) {

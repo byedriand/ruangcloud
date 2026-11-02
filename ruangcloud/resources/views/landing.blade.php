@@ -47,7 +47,7 @@
           </a>
         </div>
         <div class="landing-reveal landing-delay-5 mt-9 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-xs font-semibold text-[#64748b] lg:justify-start">
-          <span class="flex items-center gap-2"><span class="landing-check">✓</span> Kuota 100 GB</span>
+          <span class="flex items-center gap-2"><span class="landing-check">✓</span> Kuota 5 GB</span>
           <span class="flex items-center gap-2"><span class="landing-check">✓</span> Resume otomatis</span>
           <span class="flex items-center gap-2"><span class="landing-check">✓</span> Hingga 5 GB per file</span>
         </div>

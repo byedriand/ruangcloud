@@ -1,0 +1,128 @@
+# RuangCloud di Docker — jalankan dari root proyek:
+#   docker compose up -d --build
+# Aplikasi: http://localhost:8080 | Node: :8081 (Server 1), :8082 (Server 2), :8083 (Server 3)
+name: ruangcloud
+
+services:
+  # ── Aplikasi Laravel (PHP-FPM) ──────────────────────────────────────
+  app:
+    build:
+      context: .
+      target: app
+    image: ruangcloud-app
+    restart: unless-stopped
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: ruangcloud
+      DB_USERNAME: ruangcloud
+      DB_PASSWORD: ruangcloud-secret
+      APP_URL: http://localhost:8080
+      RUN_MIGRATIONS: "1"
+      RUN_SEED: "1"
+    volumes:
+      - ./.env:/var/www/html/.env:ro
+      - app-storage:/var/www/html/storage/app
+      - node-jakarta:/var/www/html/storage/app/nodes/jakarta
+      - node-bandung:/var/www/html/storage/app/nodes/bandung
+      - node-surabaya:/var/www/html/storage/app/nodes/surabaya
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ── Worker antrean (replikasi file antar node) ──────────────────────
+  worker:
+    build:
+      context: .
+      target: app
+    image: ruangcloud-app
+    restart: unless-stopped
+    command: ["php", "artisan", "queue:work", "--sleep=2", "--tries=3", "--timeout=300"]
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: ruangcloud
+      DB_USERNAME: ruangcloud
+      DB_PASSWORD: ruangcloud-secret
+      APP_URL: http://localhost:8080
+    volumes:
+      - ./.env:/var/www/html/.env:ro
+      - app-storage:/var/www/html/storage/app
+      - node-jakarta:/var/www/html/storage/app/nodes/jakarta
+      - node-bandung:/var/www/html/storage/app/nodes/bandung
+      - node-surabaya:/var/www/html/storage/app/nodes/surabaya
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+  # ── Web server Nginx ────────────────────────────────────────────────
+  web:
+    build:
+      context: .
+      target: web
+    image: ruangcloud-web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - app
+
+  # ── Database MariaDB ────────────────────────────────────────────────
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ruangcloud
+      MYSQL_USER: ruangcloud
+      MYSQL_PASSWORD: ruangcloud-secret
+      MYSQL_ROOT_PASSWORD: root-secret
+    ports:
+      - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # ── 3 node penyimpanan terdistribusi ────────────────────────────────
+  # Tiap node = container Nginx yang menyajikan volumenya sendiri.
+  # Volume yang sama juga dipasang ke container app di path yang selama
+  # ini dipakai aplikasi (storage/app/nodes/<kode>), jadi kode aplikasi
+  # tidak berubah: menulis ke folder node = menulis ke container node.
+  node-jakarta:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - node-jakarta:/data
+      - ./docker/node.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8081:80"
+
+  node-bandung:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - node-bandung:/data
+      - ./docker/node.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8082:80"
+
+  node-surabaya:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - node-surabaya:/data
+      - ./docker/node.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8083:80"
+
+volumes:
+  db-data:
+  app-storage:
+  node-jakarta:
+  node-bandung:
+  node-surabaya:

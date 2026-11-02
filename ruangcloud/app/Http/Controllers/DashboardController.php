@@ -30,6 +30,13 @@ class DashboardController extends Controller
                 'name'  => $f->name,
                 'files' => $f->files_count . ' file',
                 'tone'  => $tones[$i % count($tones)],
+                'created'       => $f->created_at->locale('id')->translatedFormat('j M Y'),
+                'size'          => Fmt::bytes($f->totalSize()),
+                'countFiles'    => $f->totalFiles(),
+                'countFolders'  => $f->totalSubfolders(),
+                'owner'         => $account->name,
+                'ownerAvatar'   => $account->avatarUrl(),
+                'ownerInitials' => Fmt::initials($account->name),
             ])->all();
 
         $nodes = StorageNode::orderBy('id')->get()->map(fn (StorageNode $n) => [

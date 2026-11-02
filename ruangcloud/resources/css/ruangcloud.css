@@ -312,3 +312,71 @@ html {
 .file-purple { color: #6a4fd0; background: linear-gradient(135deg, #efeaff, #d2c6fa); }
 .file-green  { color: #0d9468; background: linear-gradient(135deg, #dcf7ec, #a9ecd2); }
 .file-blue   { color: #2f66b3; background: linear-gradient(135deg, #e3efff, #b3d2f7); }
+/* ===== Admin Console: lapisan estetik (hanya di dalam #admin-console) ===== */
+#admin-console .glass-card {
+  background: linear-gradient(150deg, rgba(255,255,255,0.92), rgba(236,253,245,0.66) 52%, rgba(204,251,241,0.5));
+  border-color: rgba(255,255,255,0.9);
+  box-shadow: 0 2px 6px rgba(6,40,30,0.05), 0 22px 44px -20px rgba(6,40,30,0.28), inset 0 1px 0 rgba(255,255,255,0.95);
+}
+#admin-console .stat-lift {
+  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s cubic-bezier(0.22,1,0.36,1);
+}
+#admin-console .stat-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 10px rgba(6,40,30,0.06), 0 30px 54px -20px rgba(6,40,30,0.35), inset 0 1px 0 rgba(255,255,255,0.95);
+}
+@keyframes rcAdminPanelIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+#admin-console .admin-panel:not(.hidden) {
+  animation: rcAdminPanelIn 0.45s cubic-bezier(0.22,1,0.36,1) both;
+}
+#admin-console table thead tr {
+  background: linear-gradient(90deg, rgba(16,185,129,0.16), rgba(45,212,191,0.10) 60%, rgba(16,185,129,0.05));
+}
+#admin-console table thead th {
+  color: #065f46;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+#admin-console table tbody tr {
+  transition: background-color 0.18s ease;
+}
+#admin-console table tbody tr:hover {
+  background-color: rgba(236,253,245,0.8);
+}
+#admin-console .admin-nav-btn {
+  transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+#admin-console .admin-nav-btn:hover {
+  transform: translateX(3px);
+}
+#admin-console header {
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(240,253,250,0.8));
+  box-shadow: 0 10px 34px -14px rgba(6,40,30,0.22), inset 0 -1px 0 rgba(255,255,255,0.7);
+}
+#admin-console ::selection {
+  background: rgba(16,185,129,0.3);
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  #admin-console .admin-panel h2 {
+    background-image: linear-gradient(92deg, #0f172a 55%, #047857);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+
+/* ---------- Seret & lepas: pindah file / folder ---------- */
+.drop-active {
+  outline: 3px solid rgba(16, 185, 129, 0.55) !important;
+  outline-offset: -3px;
+  background-color: rgba(209, 250, 229, 0.4) !important;
+}
+.rc-dragging {
+  opacity: 0.45;
+}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\DownloadRecord;
 use App\Models\Folder;
 use App\Models\StoredFile;
 use App\Services\StorageNodeService;
@@ -45,14 +46,21 @@ class FileController extends Controller
         }
 
         $paginator = $filesQuery->latest()->paginate(20)->withQueryString();
-        $rows = $paginator->getCollection()->map(fn (StoredFile $f) => Fmt::fileRow($f))->all();
+        $rows = $paginator->getCollection()->map(fn(StoredFile $f) => Fmt::fileRow($f))->all();
 
         $tones = ['mint', 'lavender', 'amber', 'blue'];
-        $folders = $foldersQuery->orderBy('name')->get()->values()->map(fn (Folder $f, int $i) => [
+        $folders = $foldersQuery->orderBy('name')->get()->values()->map(fn(Folder $f, int $i) => [
             'id'    => $f->id,
             'name'  => $f->name,
             'files' => $f->files_count . ' file',
             'tone'  => $tones[$i % count($tones)],
+            'created'       => $f->created_at->locale('id')->translatedFormat('j M Y'),
+            'size'          => Fmt::bytes($f->totalSize()),
+            'countFiles'    => $f->totalFiles(),
+            'countFolders'  => $f->totalSubfolders(),
+            'owner'         => $user->name,
+            'ownerAvatar'   => $user->avatarUrl(),
+            'ownerInitials' => Fmt::initials($user->name),
         ])->all();
 
         return view('user.files', compact('folder', 'crumbs', 'folders', 'paginator', 'rows', 'q'));
@@ -63,30 +71,33 @@ class FileController extends Controller
     {
         $rows = StoredFile::where('user_id', $request->user()->id)
             ->latest()->take(50)->get()
-            ->map(fn (StoredFile $f) => Fmt::fileRow($f))->all();
+            ->map(fn(StoredFile $f) => Fmt::fileRow($f))->all();
 
         return view('user.recent', compact('rows'));
     }
 
-    /** Download: semua file pengguna dari seluruh folder, siap diunduh. */
+    /** Download: riwayat unduhan selesai milik pengguna. */
     public function downloads(Request $request)
     {
-        $files = StoredFile::where('user_id', $request->user()->id)
-            ->with('folder')
-            ->latest()->get();
+        $records = DownloadRecord::with(['file' => fn($q) => $q->withTrashed(), 'file.folder'])
+            ->where('user_id', $request->user()->id)
+            ->latest()
+            ->get();
 
-        $rows = $files->map(function (StoredFile $f) {
-            $row = Fmt::fileRow($f);
-            $row['folderName'] = $f->folder?->name ?? 'File saya';
-            $row['sizeRaw'] = (int) $f->size;
+        $rows = $records->map(function (DownloadRecord $r) {
+            $row = Fmt::fileRow($r->file);
+            $row['recordId']   = $r->id;
+            $row['folderName'] = $r->file->folder?->name ?? 'File saya';
+            $row['folderId']   = $r->file->folder_id;
+            $row['finishedAt'] = $r->created_at->locale('id')->translatedFormat('j M Y, H.i');
 
             return $row;
         })->all();
 
-        $totalFiles = $files->count();
-        $totalSize  = Fmt::bytes((int) $files->sum('size'));
+        $totalCount = $records->count();
+        $totalSize  = Fmt::bytes((int) $records->sum('size'));
 
-        return view('user.downloads', compact('rows', 'totalFiles', 'totalSize'));
+        return view('user.downloads', compact('rows', 'totalCount', 'totalSize'));
     }
 
     public function download(Request $request, StoredFile $file, StorageNodeService $nodes)
@@ -106,7 +117,6 @@ class FileController extends Controller
         $this->authorizeFile($request, $file);
 
         $replicas = $file->replicas()->with('node')
-            ->where('status', 'synced')
             ->orderByDesc('is_primary')
             ->get();
 
@@ -115,6 +125,10 @@ class FileController extends Controller
 
             $disk = $nodes->disk($replica->node);
             if (! $disk->exists($file->stored_path)) continue;
+
+            if ($replica->status !== 'synced') {
+                $replica->update(['status' => 'synced', 'last_error' => null]);
+            }
 
             $mime = $file->mime ?: 'application/octet-stream';
 
@@ -149,7 +163,7 @@ class FileController extends Controller
         // Nama tujuan sudah dipakai file lain di folder yang sama -> beri penanda " (1)", dst.
         $rawName = UniqueName::resolve(
             $rawName,
-            fn (string $candidate) => StoredFile::withoutTrashed()
+            fn(string $candidate) => StoredFile::withoutTrashed()
                 ->where('user_id', $file->user_id)
                 ->where('folder_id', $file->folder_id)
                 ->where('name', $candidate)
@@ -184,7 +198,7 @@ class FileController extends Controller
         // Di folder tujuan sudah ada file bernama sama -> beri penanda " (1)", dst.
         $name = UniqueName::resolve(
             $file->name,
-            fn (string $candidate) => StoredFile::withoutTrashed()
+            fn(string $candidate) => StoredFile::withoutTrashed()
                 ->where('user_id', $file->user_id)
                 ->where('folder_id', $folderId)
                 ->where('name', $candidate)

@@ -21,7 +21,7 @@
 {{-- Stat Cards --}}
 <section class="mb-6 grid grid-cols-2 gap-4 xl:grid-cols-4">
   @foreach ($stats as $stat)
-    <article class="rounded-2xl glass-card p-5 shadow-sm transition hover:shadow-md">
+    <article class="rounded-2xl glass-card stat-lift p-5 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <div class="folder-icon folder-{{ $stat['tone'] }} h-11 w-11 rounded-xl flex items-center justify-center">
           <x-icon :name="$stat['icon']" class="h-5 w-5" />

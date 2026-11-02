@@ -3,7 +3,7 @@
 @section('title', 'Admin Console â€” RuangCloud')
 
 @section('content')
-<div class="min-h-screen text-slate-900" style="background: radial-gradient(720px 420px at 85% -5%, rgba(52,211,153,.20), transparent 60%), radial-gradient(640px 480px at -10% 30%, rgba(45,212,191,.14), transparent 60%), radial-gradient(560px 420px at 55% 110%, rgba(16,185,129,.12), transparent 60%), linear-gradient(165deg, #f4faf7 0%, #eaf5ef 48%, #e6f4ee 100%);">
+<div id="admin-console" class="min-h-screen text-slate-900" style="background: radial-gradient(720px 420px at 85% -5%, rgba(52,211,153,.20), transparent 60%), radial-gradient(640px 480px at -10% 30%, rgba(45,212,191,.14), transparent 60%), radial-gradient(560px 420px at 55% 110%, rgba(16,185,129,.12), transparent 60%), linear-gradient(165deg, #f4faf7 0%, #eaf5ef 48%, #e6f4ee 100%);">
   <button type="button" id="sidebar-backdrop" hidden aria-label="Tutup menu" data-action="close-sidebar"
           class="fixed inset-0 z-30 bg-slate-900/30 backdrop-blur-sm lg:hidden"></button>
 
@@ -32,10 +32,10 @@
     </nav>
 
   
-    <a href="{{ route('profile.edit') }}" class="mt-auto flex w-full items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.05] p-2.5 text-sm font-semibold text-slate-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md transition-all hover:bg-white/10 hover:text-white">
+    <button type="button" data-panel="Profil" class="admin-nav-btn mt-auto flex w-full items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.05] p-2.5 text-left text-sm font-semibold text-slate-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md transition-all hover:bg-white/10 hover:text-white">
       <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.07] text-emerald-300 ring-1 ring-white/10"><x-icon name="user" class="h-4.5 w-4.5" /></span>
       Profil Saya
-    </a>
+    </button>
 
     <button type="button" data-action="open-admin-logout" class="mt-2 flex w-full items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.04] p-2 text-left backdrop-blur-md transition-colors hover:bg-white/10">
       @if (auth()->user()->avatarUrl())
@@ -103,6 +103,17 @@
       {{-- Panel: Audit log --}}
       <div id="panel-Audit log" class="admin-panel hidden">
         @include('admin.partials.panel-auditlog')
+      </div>
+
+      {{-- Panel: Profil --}}
+      <div id="panel-Profil" class="admin-panel hidden">
+        <div class="mb-7">
+          <h2 class="text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">Profil Admin</h2>
+          <p class="mt-1 text-sm text-slate-500">Atur foto, nama pengguna, email, dan kata sandi akun administratormu -- tetap di dalam Admin Console.</p>
+        </div>
+        <div class="mx-auto w-full max-w-5xl">
+          @include('profile.partials.forms', ['user' => auth()->user()])
+        </div>
       </div>
 
     </main>
@@ -245,4 +256,10 @@ adminLogoutModal?.addEventListener('click', (e) => {
   if (e.target === adminLogoutModal) adminLogoutModal.setAttribute('hidden', '');
 });
 </script>
+
+@if (session('open_panel') === 'Profil' || $errors->hasAny(['current_password', 'avatar']))
+<script>
+  switchPanel('Profil');
+</script>
+@endif
 @endsection

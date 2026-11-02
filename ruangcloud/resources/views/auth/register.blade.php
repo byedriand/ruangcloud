@@ -66,7 +66,7 @@
 
         <div class="mt-8 space-y-2.5">
           @foreach ([
-            ['icon' => 'archive', 'grad' => 'from-emerald-400 to-teal-500', 'title' => '100 GB Gratis', 'desc' => 'Kuota penyimpanan bawaan untuk setiap akun baru'],
+            ['icon' => 'archive', 'grad' => 'from-emerald-400 to-teal-500', 'title' => '5 GB Gratis', 'desc' => 'Kuota penyimpanan bawaan untuk setiap akun baru'],
             ['icon' => 'cloud',   'grad' => 'from-sky-400 to-blue-500',     'title' => 'Upload Chunked', 'desc' => 'File besar diunggah secara aman dengan resumable upload'],
             ['icon' => 'share',   'grad' => 'from-violet-400 to-purple-500', 'title' => 'Berbagi Mudah',  'desc' => 'Bagikan file dengan tautan publik yang bisa diproteksi'],
           ] as $f)
@@ -97,12 +97,12 @@
         <label class="block">
           <span class="mb-2 block text-xs font-bold text-[#334155]">Nama lengkap</span>
           <div class="relative">
-            <x-icon name="user" class="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <span class="pointer-events-none absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-500/30"><x-icon name="user" class="h-4 w-4" /></span>
             <input id="name" type="text" name="name"
                    value="{{ old('name') }}"
                    placeholder="Contoh: Naufal Ardana"
                    autocomplete="name"
-                   class="h-12 w-full rounded-xl border pl-11 pr-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.9)] outline-none backdrop-blur-md transition placeholder:text-slate-400
+                   class="h-12 w-full rounded-xl border pl-12 pr-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.9)] outline-none backdrop-blur-md transition placeholder:text-slate-400
                           {{ $errors->has('name') ? 'border-red-300 bg-red-50/60 focus:border-red-400 focus:ring-4 focus:ring-red-400/15' : 'border-white/80 bg-white/60 focus:border-emerald-400 focus:bg-white/85 focus:ring-4 focus:ring-emerald-500/10' }}">
           </div>
           @error('name')
@@ -117,12 +117,12 @@
         <label class="block">
           <span class="mb-2 block text-xs font-bold text-[#334155]">Alamat email</span>
           <div class="relative">
-            <x-icon name="mail" class="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <span class="pointer-events-none absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-500/30"><x-icon name="mail" class="h-4 w-4" /></span>
             <input id="email" type="email" name="email"
                    value="{{ old('email') }}"
                    placeholder="nama@email.com"
                    autocomplete="email"
-                   class="h-12 w-full rounded-xl border pl-11 pr-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.9)] outline-none backdrop-blur-md transition placeholder:text-slate-400
+                   class="h-12 w-full rounded-xl border pl-12 pr-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.9)] outline-none backdrop-blur-md transition placeholder:text-slate-400
                           {{ $errors->has('email') ? 'border-red-300 bg-red-50/60 focus:border-red-400 focus:ring-4 focus:ring-red-400/15' : 'border-white/80 bg-white/60 focus:border-emerald-400 focus:bg-white/85 focus:ring-4 focus:ring-emerald-500/10' }}">
           </div>
           @error('email')
@@ -137,13 +137,13 @@
         <label class="block">
           <span class="mb-2 block text-xs font-bold text-[#334155]">Kata sandi</span>
           <div class="relative">
-            <x-icon name="lock" class="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <span class="pointer-events-none absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-500/30"><x-icon name="lock" class="h-4 w-4" /></span>
             <input id="password" type="password" name="password"
                    placeholder="Minimal 8 karakter"
                    autocomplete="new-password"
-                   class="h-12 w-full rounded-xl border pl-11 pr-14 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.9)] outline-none backdrop-blur-md transition placeholder:text-slate-400
+                   class="h-12 w-full rounded-xl border pl-12 pr-14 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.9)] outline-none backdrop-blur-md transition placeholder:text-slate-400
                           {{ $errors->has('password') ? 'border-red-300 bg-red-50/60 focus:border-red-400 focus:ring-4 focus:ring-red-400/15' : 'border-white/80 bg-white/60 focus:border-emerald-400 focus:bg-white/85 focus:ring-4 focus:ring-emerald-500/10' }}"
-                   oninput="checkStrength(this.value)">
+>
             <button type="button" id="toggle-pw" data-action="toggle-password"
                     class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#078d6d]">Lihat</button>
           </div>
@@ -167,12 +167,14 @@
         <label class="block">
           <span class="mb-2 block text-xs font-bold text-[#334155]">Konfirmasi kata sandi</span>
           <div class="relative">
-            <x-icon name="lock" class="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <span class="pointer-events-none absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-500/30"><x-icon name="lock" class="h-4 w-4" /></span>
             <input id="password_confirmation" type="password" name="password_confirmation"
                    placeholder="Ulangi kata sandi"
                    autocomplete="new-password"
-                   class="h-12 w-full rounded-xl border border-white/80 bg-white/60 pl-11 pr-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.9)] outline-none backdrop-blur-md transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white/85 focus:ring-4 focus:ring-emerald-500/10"
-                   oninput="checkMatch()">
+                   class="h-12 w-full rounded-xl border border-white/80 bg-white/60 pl-12 pr-14 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.9)] outline-none backdrop-blur-md transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white/85 focus:ring-4 focus:ring-emerald-500/10"
+>
+            <button type="button" data-action="toggle-password"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#078d6d]">Lihat</button>
           </div>
           <p class="mt-1.5 hidden text-xs" id="match-label"></p>
         </label>
@@ -215,14 +217,9 @@
 
 <script>
 // ── Toggle password visibility ────────────────────────────────────
-document.querySelectorAll('[data-action="toggle-password"]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const pw = document.getElementById('password');
-    const isHidden = pw.type === 'password';
-    pw.type = isHidden ? 'text' : 'password';
-    btn.textContent = isHidden ? 'Sembunyikan' : 'Lihat';
-  });
-});
+// Toggle Lihat/Sembunyikan kata sandi ditangani global oleh ruangcloud.js
+// lewat data-action="toggle-password" -- jangan diikat lagi di sini, klik
+// akan memicu dua kali dan saling meniadakan (tombol terlihat mati).
 
 // ── Password strength ─────────────────────────────────────────────
 function checkStrength(pw) {

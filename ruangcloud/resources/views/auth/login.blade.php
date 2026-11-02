@@ -104,14 +104,18 @@
 
         <label class="block">
           <span class="mb-2 block text-xs font-bold text-[#334155]">Alamat email</span>
-          <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="nama@email.com" class="h-12 w-full rounded-xl border border-white/80 bg-white/60 px-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.9)] outline-none backdrop-blur-md transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white/85 focus:ring-4 focus:ring-emerald-500/10">
+          <div class="relative">
+            <span class="pointer-events-none absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-500/30"><x-icon name="mail" class="h-4 w-4" /></span>
+            <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="nama@email.com" class="h-12 w-full rounded-xl border border-white/80 bg-white/60 pl-12 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.9)] outline-none backdrop-blur-md transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white/85 focus:ring-4 focus:ring-emerald-500/10">
+          </div>
           @error('email')<span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>@enderror
         </label>
 
         <label class="block">
           <span class="mb-2 block text-xs font-bold text-[#334155]">Kata sandi</span>
           <div class="relative">
-            <input id="password" type="password" name="password" placeholder="Kata sandi Anda" class="h-12 w-full rounded-xl border border-white/80 bg-white/60 px-4 pr-16 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.9)] outline-none backdrop-blur-md transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white/85 focus:ring-4 focus:ring-emerald-500/10">
+            <span class="pointer-events-none absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-700 ring-1 ring-emerald-500/30"><x-icon name="lock" class="h-4 w-4" /></span>
+            <input id="password" type="password" name="password" placeholder="Kata sandi Anda" class="h-12 w-full rounded-xl border border-white/80 bg-white/60 pl-12 pr-16 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,.9)] outline-none backdrop-blur-md transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white/85 focus:ring-4 focus:ring-emerald-500/10">
             <button type="button" data-action="toggle-password" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#078d6d]">Lihat</button>
           </div>
           @error('password')<span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>@enderror
@@ -131,4 +135,6 @@
     </div>
   </div>
 </div>
+
+@include('components.success-popup')
 @endsection

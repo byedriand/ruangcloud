@@ -9,10 +9,10 @@
         @if ($q !== '') Hasil untuk "{{ $q }}" @elseif ($folder) {{ $folder->name }} @else File saya @endif
       </h1>
       <nav class="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-slate-500">
-        <a href="{{ route('files.index') }}" class="font-medium hover:text-emerald-600 transition">File saya</a>
+        <a href="{{ route('files.index') }}" data-drop-folder="root" class="rounded-md px-1 font-medium transition hover:text-emerald-600">File saya</a>
         @foreach ($crumbs as $crumb)
           <x-icon name="chevron" class="h-3.5 w-3.5 text-slate-400" />
-          <a href="{{ route('files.index', ['folder' => $crumb->id]) }}" class="{{ $loop->last ? 'font-bold text-slate-800' : 'font-medium hover:text-emerald-600' }} transition">{{ $crumb->name }}</a>
+          <a href="{{ route('files.index', ['folder' => $crumb->id]) }}" data-drop-folder="{{ $crumb->id }}" class="rounded-md px-1 {{ $loop->last ? 'font-bold text-slate-800' : 'font-medium hover:text-emerald-600' }} transition">{{ $crumb->name }}</a>
         @endforeach
       </nav>
     </div>
@@ -33,7 +33,7 @@
       </div>
       <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         @forelse ($folders as $item)
-          <x-folder-card :name="$item['name']" :files="$item['files']" :tone="$item['tone']" :href="route('files.index', ['folder' => $item['id']])" />
+          <x-folder-card :folder="$item" :href="route('files.index', ['folder' => $item['id']])" />
         @empty
           <div class="col-span-full rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-6 text-center text-sm font-medium text-slate-500">
             Belum ada folder di direktori ini.
