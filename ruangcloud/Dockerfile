@@ -10,8 +10,8 @@ RUN npm run build
 FROM php:8.2-fpm-bookworm AS app
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      git unzip libzip-dev libonig-dev libxml2-dev libicu-dev default-mysql-client \
- && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring xml bcmath zip exif pcntl intl \
+      git unzip libzip-dev libonig-dev libxml2-dev libicu-dev libpq-dev postgresql-client \
+ && docker-php-ext-install -j"$(nproc)" pdo_mysql pdo_pgsql mbstring xml bcmath zip exif pcntl intl \
  && pecl install redis \
  && docker-php-ext-enable redis \
  && apt-get clean && rm -rf /var/lib/apt/lists/*

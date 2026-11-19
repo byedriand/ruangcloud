@@ -9,7 +9,7 @@ Panduan menjalankan RuangCloud sebagai container Docker (pengganti/alternatif XA
 | `web` | Nginx (web server) | http://localhost:8080 |
 | `app` | Laravel di PHP-FPM 8.2 | internal (port 9000) |
 | `worker` | Queue worker (replikasi file antar node) | — |
-| `db` | MariaDB 11 | localhost:3307 |
+| `db` | PostgreSQL 16 | localhost:5433 |
 | `redis` | Redis 7 (antrean + cache) | localhost:6380 |
 | `node-jakarta` | Node penyimpanan Server 1 | http://localhost:8081 |
 | `node-bandung` | Node penyimpanan Server 2 | http://localhost:8082 |
@@ -61,4 +61,4 @@ docker compose up -d --build      # bangun ulang setelah ada perubahan kode
   mulai dari kosong (data XAMPP tidak ikut pindah).
 - File `.env` proyek tetap dipakai (di-mount ke container); nilai `DB_*` dan `APP_URL`
   ditimpa oleh `docker-compose.yml` agar menunjuk ke container `db`.
-- Port sengaja digeser (web 8080, db 3307) agar tidak bentrok dengan XAMPP/`artisan serve`.
+- Port sengaja digeser (web 8080, db 5433, redis 6380) agar tidak bentrok dengan XAMPP/`artisan serve`.

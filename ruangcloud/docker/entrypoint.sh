@@ -4,11 +4,13 @@
 # - Khusus service "app" (RUN_MIGRATIONS=1): migrasi + storage:link + seed awal.
 set -e
 
-echo "Menunggu database di ${DB_HOST:-db}:${DB_PORT:-3306}..."
+echo "Menunggu database di ${DB_HOST:-db}:${DB_PORT:-5432}..."
 until php -r '
+    $driver = getenv("DB_CONNECTION") ?: "pgsql";
+    $port = getenv("DB_PORT") ?: ($driver === "pgsql" ? "5432" : "3306");
     try {
         new PDO(
-            "mysql:host=" . (getenv("DB_HOST") ?: "db") . ";port=" . (getenv("DB_PORT") ?: "3306"),
+            $driver . ":host=" . (getenv("DB_HOST") ?: "db") . ";port=" . $port,
             getenv("DB_USERNAME"),
             getenv("DB_PASSWORD")
         );

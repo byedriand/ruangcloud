@@ -1,6 +1,6 @@
 # RuangCloud di Docker — jalankan dari root proyek:
 #   docker compose up -d --build
-# Aplikasi: http://localhost:8080 | Node: :8081 (Server 1), :8082 (Server 2), :8083 (Server 3) | Redis: :6380
+# Aplikasi: http://localhost:8080 | Node: :8081 (Server 1), :8082 (Server 2), :8083 (Server 3) | Redis: :6380 | PostgreSQL: :5433
 name: ruangcloud
 
 services:
@@ -12,8 +12,9 @@ services:
     image: ruangcloud-app
     restart: unless-stopped
     environment:
+      DB_CONNECTION: pgsql
       DB_HOST: db
-      DB_PORT: "3306"
+      DB_PORT: "5432"
       DB_DATABASE: ruangcloud
       DB_USERNAME: ruangcloud
       DB_PASSWORD: ruangcloud-secret
@@ -44,8 +45,9 @@ services:
     restart: unless-stopped
     command: ["php", "artisan", "queue:work", "--sleep=2", "--tries=3", "--timeout=300"]
     environment:
+      DB_CONNECTION: pgsql
       DB_HOST: db
-      DB_PORT: "3306"
+      DB_PORT: "5432"
       DB_DATABASE: ruangcloud
       DB_USERNAME: ruangcloud
       DB_PASSWORD: ruangcloud-secret
@@ -79,21 +81,20 @@ services:
     depends_on:
       - app
 
-  # ── Database MariaDB ────────────────────────────────────────────────
+  # ── Database PostgreSQL ─────────────────────────────────────────────
   db:
-    image: mariadb:11
+    image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ruangcloud
-      MYSQL_USER: ruangcloud
-      MYSQL_PASSWORD: ruangcloud-secret
-      MYSQL_ROOT_PASSWORD: root-secret
+      POSTGRES_DB: ruangcloud
+      POSTGRES_USER: ruangcloud
+      POSTGRES_PASSWORD: ruangcloud-secret
     ports:
-      - "3307:3306"
+      - "5433:5432"
     volumes:
-      - db-data:/var/lib/mysql
+      - db-pgsql-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: ["CMD-SHELL", "pg_isready -U ruangcloud -d ruangcloud"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -146,6 +147,7 @@ services:
 
 volumes:
   db-data:
+  db-pgsql-data:
   redis-data:
   app-storage:
   node-jakarta:

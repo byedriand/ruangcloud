@@ -8,7 +8,7 @@
 [![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![MariaDB](https://img.shields.io/badge/MariaDB-11-003545?style=for-the-badge&logo=mariadb&logoColor=white)](https://mariadb.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
 [![License](https://img.shields.io/badge/License-Academic%20%2F%20MIT-green?style=for-the-badge)](#lisensi)
 
@@ -108,7 +108,7 @@ Sistem RuangCloud dirancang dengan arsitektur 4 lapisan modular (*four-tier deco
                    │ Query & Transaction             │ Read / Write / Health
 ┌──────────────────▼───────────────┐ ┌───────────────▼───────────────────┐
 │       LAPISAN DATA (DATABASE)     │ │  LAPISAN PENYIMPANAN TERDISTRIBUSI │
-│  MariaDB Database:               │ │  Cluster Storage Nodes (3 Node)    │
+│  PostgreSQL Database:            │ │  Cluster Storage Nodes (3 Node)    │
 │  • Metadata File & Folder        │ │  • Node Jakarta (Primary / Replica)│
 │  • Status Sesi Chunk & Upload    │ │  • Node Bandung (Primary / Replica)│
 │  • RBAC, Kuota, Share Links      │ │  • Node Surabaya (Primary/Replica) │
@@ -189,10 +189,10 @@ Sistem mengimplementasikan seluruh kebutuhan fungsional modul **F-01 hingga F-09
 |:---|:---|:---|
 | **Backend Framework** | Laravel 12.x (PHP 8.2+) | RESTful API, Blade Components, Queue Jobs, Eloquent ORM |
 | **Frontend UI** | Vanilla JS + Tailwind CSS v4 + Vite 7 | Tema kaca (glassmorphism), responsif, tanpa framework JS berat |
-| **Database** | MariaDB 11 | Transaksional, foreign key berindeks, UTF8MB4 |
-| **Queue / Asinkron** | Laravel Database Queue | Penggabungan chunk & replikasi antar node oleh worker khusus |
+| **Database** | PostgreSQL 16 | Transaksional, foreign key berindeks, encoding UTF8 |
+| **Queue / Asinkron** | Laravel Queue + Redis | Penggabungan chunk & replikasi antar node oleh worker khusus |
 | **Penyimpanan Node** | Local Storage Multi-Directory | Simulasi cluster 3 node (Jakarta, Bandung, Surabaya) |
-| **Kontainerisasi** | Docker & Docker Compose | 7 service: web (nginx), app (PHP-FPM), worker, db, 3 node |
+| **Kontainerisasi** | Docker & Docker Compose | 8 service: web (nginx), app (PHP-FPM), worker, db, redis, 3 node |
 | **Keamanan & Standar** | SHA-256, Bcrypt, PSR-12, OWASP | Validasi MIME, integritas hash kriptografis, proteksi CSRF |
 
 ---
@@ -220,7 +220,8 @@ Buka aplikasi di: **`http://localhost:8080`**
 | Service | Port Host | Keterangan |
 |:---|:---:|:---|
 | `web` | **8080** | nginx → aplikasi RuangCloud |
-| `db` | 3307 | MariaDB 11 (database `ruangcloud`) |
+| `db` | 5433 | PostgreSQL 16 (database `ruangcloud`) |
+| `redis` | 6380 | Redis 7 (antrean + cache) |
 | `node-jakarta` | 8081 | Server 1 — node penyimpanan Jakarta |
 | `node-bandung` | 8082 | Server 2 — node penyimpanan Bandung |
 | `node-surabaya` | 8083 | Server 3 — node penyimpanan Surabaya |
@@ -244,7 +245,7 @@ Panduan Docker lebih rinci tersedia di berkas `DOCKER.md` pada direktori aplikas
 Alternatif untuk pengembangan tanpa Docker (misalnya dengan XAMPP):
 
 ### Prasyarat
-- PHP 8.2+ (ekstensi: `fileinfo`, `pdo_mysql`, `mbstring`, `openssl`, `zip`), Composer 2.x, Node.js 18+ & npm, MariaDB/MySQL.
+- PHP 8.2+ (ekstensi: `fileinfo`, `pdo_pgsql`, `mbstring`, `openssl`, `zip`), Composer 2.x, Node.js 18+ & npm, PostgreSQL.
 - `php.ini`: `upload_max_filesize` dan `post_max_size` harus lebih besar dari ukuran chunk 5 MB (pada paket Docker nilai ini sudah diatur 64M/72M).
 
 ### Langkah
