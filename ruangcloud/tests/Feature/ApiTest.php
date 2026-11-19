@@ -70,6 +70,16 @@ class ApiTest extends TestCase
 
         $this->withToken($token)->getJson('/api/me')->assertOk();
         $this->withToken($token)->postJson('/api/logout')->assertOk();
+
+        // Token harus benar-benar terhapus dari database.
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+
+        // Guard Sanctum menyimpan user yang sudah terautentikasi selama satu
+        // method test berjalan (di pemakaian nyata tiap request adalah proses
+        // baru). Bersihkan cache guard agar request berikutnya memeriksa
+        // token ke database, sama seperti request HTTP sungguhan.
+        $this->app->make('auth')->forgetGuards();
+
         $this->withToken($token)->getJson('/api/me')->assertUnauthorized();
     }
 
