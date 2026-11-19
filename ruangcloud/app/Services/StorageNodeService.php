@@ -9,19 +9,22 @@ use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 /**
- * Akses ke storage node. Saat ini tiap node = satu folder lokal (driver "local").
- * Untuk node di server lain / MinIO, cukup ganti isi disk() menjadi driver "s3"
- * atau path jaringan; kode lain tidak perlu berubah.
+ * Akses ke storage node. Tiap node = satu bucket MinIO (driver "s3") yang
+ * namanya sama dengan kode node (jakarta, bandung, surabaya). Endpoint dan
+ * kredensial dibaca dari konfigurasi disk "s3" (variabel AWS_*; di Docker
+ * diarahkan ke service minio). Seluruh kode lain cukup memakai disk ini,
+ * tidak perlu tahu backend-nya.
  */
 class StorageNodeService
 {
     public function disk(StorageNode $node)
     {
-        return Storage::build([
-            'driver' => 'local',
-            'root'   => $node->path,
-            'throw'  => true,
-        ]);
+        return Storage::build(array_merge(config('filesystems.disks.s3'), [
+            'bucket'                  => $node->code,
+            'use_path_style_endpoint' => true,
+            'throw'                   => true,
+            'report'                  => true,
+        ]));
     }
 
     /** Pilih node aktif dengan ruang kosong terbesar (KAK F-05). */

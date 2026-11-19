@@ -3,10 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Models\StorageNode;
+use App\Services\StorageNodeService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 /**
  * Bersihkan semua data uji (file, folder, audit log, sesi unggah, antrean),
@@ -33,7 +35,7 @@ class CleanData extends Command
         'failed_jobs',
     ];
 
-    public function handle(): int
+    public function handle(StorageNodeService $nodes): int
     {
         $usersKept = DB::table('users')->count();
         $filesCount = DB::table('files')->count();
@@ -61,11 +63,14 @@ class CleanData extends Command
         }
         Schema::enableForeignKeyConstraints();
 
-        // 2) Hapus file fisik di setiap storage node (folder node-nya sendiri dipertahankan).
+        // 2) Hapus file fisik di setiap storage node (bucket node-nya sendiri dipertahankan).
         foreach (StorageNode::all() as $node) {
-            if ($node->path && str_starts_with($node->path, storage_path('app')) && File::isDirectory($node->path)) {
-                File::cleanDirectory($node->path);
+            try {
+                $disk = $nodes->disk($node);
+                $disk->delete($disk->allFiles());
                 $this->line("File fisik di node {$node->name} dihapus.");
+            } catch (Throwable $e) {
+                $this->warn("Node {$node->name} tidak dapat dibersihkan: {$e->getMessage()}");
             }
         }
 

@@ -52,8 +52,15 @@ class ReplicateFile implements ShouldQueue
                     fclose($stream);
                 }
 
-                // Verifikasi integritas replika (SHA-256).
-                if (hash_file('sha256', $dstDisk->path($file->stored_path)) !== $file->checksum_sha256) {
+                // Verifikasi integritas replika (SHA-256) dari stream baca,
+                // agar berlaku sama untuk semua backend disk (lokal / S3).
+                $verify = $dstDisk->readStream($file->stored_path);
+                $ctx = hash_init('sha256');
+                hash_update_stream($ctx, $verify);
+                if (is_resource($verify)) {
+                    fclose($verify);
+                }
+                if (hash_final($ctx) !== $file->checksum_sha256) {
                     $dstDisk->delete($file->stored_path);
                     throw new \RuntimeException('Checksum replika tidak cocok.');
                 }

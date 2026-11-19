@@ -1,6 +1,6 @@
 # RuangCloud di Docker — jalankan dari root proyek:
 #   docker compose up -d --build
-# Aplikasi: http://localhost:8080 | Node: :8081 (Server 1), :8082 (Server 2), :8083 (Server 3) | Redis: :6380 | PostgreSQL: :5433
+# Aplikasi: http://localhost:8080 | MinIO: API :9000, Konsol :9001 | Redis: :6380 | PostgreSQL: :5433 | Mailpit (email lokal): http://localhost:8025
 name: ruangcloud
 
 services:
@@ -22,19 +22,30 @@ services:
       QUEUE_CONNECTION: redis
       CACHE_STORE: redis
       REDIS_HOST: redis
+      AWS_ACCESS_KEY_ID: ruangcloud
+      AWS_SECRET_ACCESS_KEY: ruangcloud-secret
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ENDPOINT: http://minio:9000
+      AWS_USE_PATH_STYLE_ENDPOINT: "true"
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: "1025"
+      MAIL_FROM_ADDRESS: noreply@ruangcloud.id
+      MAIL_FROM_NAME: RuangCloud
       RUN_MIGRATIONS: "1"
       RUN_SEED: "1"
     volumes:
       - ./.env:/var/www/html/.env:ro
       - app-storage:/var/www/html/storage/app
-      - node-jakarta:/var/www/html/storage/app/nodes/jakarta
-      - node-bandung:/var/www/html/storage/app/nodes/bandung
-      - node-surabaya:/var/www/html/storage/app/nodes/surabaya
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      mailpit:
+        condition: service_started
 
   # ── Worker antrean (replikasi file antar node) ──────────────────────
   worker:
@@ -55,12 +66,19 @@ services:
       QUEUE_CONNECTION: redis
       CACHE_STORE: redis
       REDIS_HOST: redis
+      AWS_ACCESS_KEY_ID: ruangcloud
+      AWS_SECRET_ACCESS_KEY: ruangcloud-secret
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ENDPOINT: http://minio:9000
+      AWS_USE_PATH_STYLE_ENDPOINT: "true"
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: "1025"
+      MAIL_FROM_ADDRESS: noreply@ruangcloud.id
+      MAIL_FROM_NAME: RuangCloud
     volumes:
       - ./.env:/var/www/html/.env:ro
       - app-storage:/var/www/html/storage/app
-      - node-jakarta:/var/www/html/storage/app/nodes/jakarta
-      - node-bandung:/var/www/html/storage/app/nodes/bandung
-      - node-surabaya:/var/www/html/storage/app/nodes/surabaya
     depends_on:
       db:
         condition: service_healthy
@@ -113,43 +131,66 @@ services:
       timeout: 3s
       retries: 20
 
-  # ── 3 node penyimpanan terdistribusi ────────────────────────────────
-  # Tiap node = container Nginx yang menyajikan volumenya sendiri.
-  # Volume yang sama juga dipasang ke container app di path yang selama
-  # ini dipakai aplikasi (storage/app/nodes/<kode>), jadi kode aplikasi
-  # tidak berubah: menulis ke folder node = menulis ke container node.
-  node-jakarta:
-    image: nginx:alpine
+  # ── Mailpit: penangkap email lokal ──────────────────────────────────
+  # Semua email keluar aplikasi (mis. tautan reset kata sandi REQ-F-05)
+  # masuk ke kotak masuk web Mailpit di http://localhost:8025; tidak ada
+  # email yang benar-benar terkirim keluar. Di produksi, arahkan
+  # MAIL_HOST/MAIL_PORT ke SMTP asli — kode tidak berubah.
+  mailpit:
+    image: axllent/mailpit:latest
     restart: unless-stopped
-    volumes:
-      - node-jakarta:/data
-      - ./docker/node.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
-      - "8081:80"
+      - "8025:8025"
+      - "1025:1025"
 
-  node-bandung:
-    image: nginx:alpine
+  # ── MinIO: cluster node penyimpanan (S3) ────────────────────────────
+  # Tiap storage node = satu bucket MinIO bernama sesuai kode node
+  # (jakarta, bandung, surabaya). Aplikasi mengaksesnya lewat API S3
+  # (service "minio", port 9000); isi bucket dapat diintip dari konsol
+  # web MinIO di http://localhost:9001 (masuk: ruangcloud / ruangcloud-secret).
+  # Image server memakai pgsty/silo (fork komunitas MinIO): image resmi
+  # minio/minio dan minio/mc dihapus dari Docker Hub sejak September 2026.
+  # API S3, variabel MINIO_*, perintah server, dan konsolnya identik.
+  minio:
+    image: pgsty/silo:latest
     restart: unless-stopped
-    volumes:
-      - node-bandung:/data
-      - ./docker/node.conf:/etc/nginx/conf.d/default.conf:ro
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ruangcloud
+      MINIO_ROOT_PASSWORD: ruangcloud-secret
     ports:
-      - "8082:80"
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
 
-  node-surabaya:
-    image: nginx:alpine
-    restart: unless-stopped
-    volumes:
-      - node-surabaya:/data
-      - ./docker/node.conf:/etc/nginx/conf.d/default.conf:ro
-    ports:
-      - "8083:80"
+  # ── Pembuat bucket node (sekali jalan, lalu berhenti) ───────────────
+  # Container app menunggu service ini selesai (depends_on
+  # service_completed_successfully) agar bucket node sudah ada sebelum
+  # aplikasi menerima unggahan pertama. Status "Exited (0)" di
+  # docker compose ps adalah normal untuk service ini.
+  minio-init:
+    image: pgsty/mc:latest
+    depends_on:
+      - minio
+    entrypoint:
+      - /bin/sh
+      - -c
+      - >
+        until mc alias set lokal http://minio:9000 ruangcloud ruangcloud-secret; do
+        echo "Menunggu MinIO siap..."; sleep 2; done;
+        mc mb --ignore-existing lokal/jakarta &&
+        mc mb --ignore-existing lokal/bandung &&
+        mc mb --ignore-existing lokal/surabaya
 
 volumes:
   db-data:
   db-pgsql-data:
   redis-data:
   app-storage:
+  minio-data:
+  # Volume node lokal lama (era sebelum MinIO) — tidak lagi dipakai,
+  # dipertahankan agar data lama tidak ikut terhapus (rollback manual).
   node-jakarta:
   node-bandung:
   node-surabaya:
