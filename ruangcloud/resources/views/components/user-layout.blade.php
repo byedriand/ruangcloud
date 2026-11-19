@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>{{ $title }} â€” RuangCloud</title>
+  <title>{{ $title }} — RuangCloud</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -330,7 +330,7 @@
       </div>
       <div id="preview-loading" class="flex flex-col items-center gap-3 text-white/60">
         <svg class="h-9 w-9 animate-spin text-emerald-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
-        <p class="text-sm font-medium">Memuat pratinjauâ€¦</p>
+        <p class="text-sm font-medium">Memuat pratinjau…</p>
       </div>
     </div>
   </div>

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DownloadController;
@@ -24,6 +25,13 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.store');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.store');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Lupa / reset kata sandi (REQ-F-05) — nama rute password.reset dipakai
+// notifikasi email untuk menyusun tautan reset.
+Route::get('/lupa-kata-sandi', [AuthController::class, 'showForgotPassword'])->name('password.request');
+Route::post('/lupa-kata-sandi', [AuthController::class, 'sendResetLink'])->middleware('throttle:10,1')->name('password.email');
+Route::get('/atur-ulang-kata-sandi/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
+Route::post('/atur-ulang-kata-sandi', [AuthController::class, 'resetPassword'])->name('password.update');
 
 // Tautan berbagi publik (tanpa login)
 Route::middleware('throttle:30,1')->group(function () {
@@ -60,6 +68,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/admin/users/{user}', [AdminController::class, 'destroyUser'])
         ->middleware(EnsureRole::class . ':admin')
         ->name('admin.users.destroy');
+    Route::get('/admin/laporan/sistem', [AdminReportController::class, 'sistem'])
+        ->middleware(EnsureRole::class . ':admin')
+        ->name('admin.laporan.sistem');
+    Route::get('/admin/laporan/penyimpanan', [AdminReportController::class, 'penyimpanan'])
+        ->middleware(EnsureRole::class . ':admin')
+        ->name('admin.laporan.penyimpanan');
+    Route::get('/admin/laporan/audit', [AdminReportController::class, 'audit'])
+        ->middleware(EnsureRole::class . ':admin')
+        ->name('admin.laporan.audit');
 
     // Profil akun (dipakai bersama: user & admin)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

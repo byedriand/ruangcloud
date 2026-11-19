@@ -4,10 +4,10 @@
     <h2 class="text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">Penyimpanan Terdistribusi</h2>
     <p class="mt-1 text-sm text-slate-500">Pantau kapasitas cluster node penyimpanan dan distribusi file.</p>
   </div>
-  <button type="button" data-action="toast" data-message="Laporan penyimpanan sedang disiapkan"
+  <a href="{{ route('admin.laporan.penyimpanan') }}"
           class="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white/70 backdrop-blur-md px-4.5 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50">
     <x-icon name="download" class="h-4 w-4 text-emerald-600" /> Ekspor Laporan
-  </button>
+  </a>
 </div>
 
 {{-- Overall Usage --}}

@@ -10,10 +10,10 @@
       <input id="audit-search" class="h-10 w-64 rounded-xl bg-white/70 backdrop-blur-md border border-[#d9e3df] pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-[#0cb48c]/20 transition-all"
              placeholder="Cari aktivitas..." oninput="filterAudit(this.value)">
     </div>
-    <button type="button" data-action="toast" data-message="Ekspor audit log sedang disiapkan"
+    <a href="{{ route('admin.laporan.audit') }}"
             class="flex h-10 items-center gap-2 rounded-xl border border-[#d9e3df] bg-white/70 backdrop-blur-md px-4 text-xs font-bold text-[#46544f] hover:border-[#0cb48c] transition-colors">
       <x-icon name="download" class="h-4 w-4" /> Ekspor
-    </button>
+    </a>
   </div>
 </div>
 

@@ -93,6 +93,15 @@ class AdminController extends Controller
             'time' => $a->created_at->copy()->locale('id')->diffForHumans(),
         ])->all();
 
+        // Dropdown notifikasi di header: 8 aktivitas sistem terakhir.
+        // Titik indikator hanya muncul bila ada aktivitas dalam 24 jam terakhir.
+        $notifications = ActivityLog::latest()->take(8)->get()->map(fn (ActivityLog $a) => [
+            'icon' => $icons[$a->action] ?? 'activity',
+            'text' => $this->anonymizeFileNames($a->description),
+            'time' => $a->created_at->copy()->locale('id')->diffForHumans(),
+        ])->all();
+        $hasFreshActivity = ActivityLog::where('created_at', '>=', now()->subDay())->exists();
+
         /* ─── PENGGUNA ───────────────────────────────────────────────── */
         $allUsers = User::orderBy('name')->get();
         $newUsersThisMonth = User::where('created_at', '>=', now()->startOfMonth())->count();
@@ -163,6 +172,7 @@ class AdminController extends Controller
             // Ringkasan
             'stats', 'chartValues', 'chartTips', 'chartLabels',
             'nodes', 'nodesActive', 'nodesTotal', 'users', 'activities',
+            'notifications', 'hasFreshActivity',
             // Pengguna
             'allUsers', 'newUsersThisMonth',
             // Penyimpanan

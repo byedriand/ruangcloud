@@ -12,10 +12,10 @@
     <h2 class="text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">Ringkasan Sistem</h2>
     <p class="mt-1 text-sm text-slate-500">Pantau performa RuangCloud, kapasitas storage node, dan aktivitas pengguna.</p>
   </div>
-  <button type="button" data-action="toast" data-message="Laporan sistem sedang disiapkan"
+  <a href="{{ route('admin.laporan.sistem') }}"
           class="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white/70 backdrop-blur-md px-4.5 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50">
     <x-icon name="download" class="h-4 w-4 text-emerald-600" /> Unduh laporan
-  </button>
+  </a>
 </div>
 
 {{-- Stat Cards --}}
@@ -122,7 +122,7 @@
             </div>
           </div>
           <span class="w-fit rounded-full px-2.5 py-1 text-xs font-bold {{ $user['status'] === 'Aktif' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600' }}">{{ $user['status'] }}</span>
-          <button type="button" data-action="toast" data-message="{{ $user['name'] }} dipilih" class="text-slate-400 hover:text-slate-700">
+          <button type="button" data-action="nav" data-nav="Pengguna" title="Kelola di panel Pengguna" class="text-slate-400 hover:text-slate-700">
             <x-icon name="more" class="h-4.5 w-4.5" />
           </button>
         </div>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Admin Console â€” RuangCloud')
+@section('title', 'Admin Console — RuangCloud')
 
 @section('content')
 <div id="admin-console" class="min-h-screen text-slate-900" style="background: radial-gradient(720px 420px at 85% -5%, rgba(52,211,153,.20), transparent 60%), radial-gradient(640px 480px at -10% 30%, rgba(45,212,191,.14), transparent 60%), radial-gradient(560px 420px at 55% 110%, rgba(16,185,129,.12), transparent 60%), linear-gradient(165deg, #f4faf7 0%, #eaf5ef 48%, #e6f4ee 100%);">
@@ -66,14 +66,42 @@
       <div class="ml-auto flex items-center gap-3">
         <div class="relative hidden sm:block">
           <x-icon name="search" class="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-slate-400" />
-          <input class="h-10 w-64 rounded-xl border border-white/60 bg-gradient-to-r from-white/75 via-white/60 to-emerald-100/40 pl-10 pr-3.5 text-xs font-medium text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_28px_-12px_rgba(6,40,30,0.28)] outline-none backdrop-blur-xl transition placeholder:text-slate-500 focus:border-emerald-400 focus:from-white/90 focus:to-white/85 focus:ring-4 focus:ring-emerald-500/15"
-                 placeholder="Cari pengguna atau aktivitas...">
+          <input id="admin-global-search" class="h-10 w-64 rounded-xl border border-white/60 bg-gradient-to-r from-white/75 via-white/60 to-emerald-100/40 pl-10 pr-3.5 text-xs font-medium text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_28px_-12px_rgba(6,40,30,0.28)] outline-none backdrop-blur-xl transition placeholder:text-slate-500 focus:border-emerald-400 focus:from-white/90 focus:to-white/85 focus:ring-4 focus:ring-emerald-500/15"
+                 placeholder="Cari pengguna, tekan Enter...">
         </div>
-        <button type="button" data-action="toast" data-message="Semua sistem beroperasi normal"
-                class="relative rounded-2xl border border-white/60 bg-white/60 p-2.5 text-slate-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_20px_-10px_rgba(6,40,30,0.25)] backdrop-blur-xl transition hover:bg-white/85 hover:text-emerald-700">
-          <x-icon name="bell" class="h-5 w-5" />
-          <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
-        </button>
+        <div class="relative" id="notif-wrap">
+          <button type="button" id="notif-btn" aria-label="Notifikasi"
+                  class="relative rounded-2xl border border-white/60 bg-white/60 p-2.5 text-slate-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_20px_-10px_rgba(6,40,30,0.25)] backdrop-blur-xl transition hover:bg-white/85 hover:text-emerald-700">
+            <x-icon name="bell" class="h-5 w-5" />
+            @if ($hasFreshActivity)
+              <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+            @endif
+          </button>
+          <div id="notif-panel" hidden class="absolute right-0 top-[calc(100%+10px)] z-40 w-[340px] max-w-[86vw] overflow-hidden rounded-2xl border border-white/60 bg-white/95 text-left shadow-[0_24px_60px_-16px_rgba(6,40,30,0.35)] backdrop-blur-xl">
+            <div class="border-b border-slate-100 px-4 py-3">
+              <p class="text-xs font-extrabold uppercase tracking-wider text-slate-600">Notifikasi</p>
+              <p class="mt-0.5 text-[11px] text-slate-400">Aktivitas sistem terakhir (nama berkas disamarkan)</p>
+            </div>
+            <div class="max-h-[320px] overflow-y-auto">
+              @forelse ($notifications as $n)
+                <div class="flex gap-3 border-b border-slate-50 px-4 py-3 last:border-0">
+                  <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                    <x-icon :name="$n['icon']" class="h-4 w-4" />
+                  </span>
+                  <div class="min-w-0">
+                    <p class="text-xs font-medium leading-relaxed text-slate-700">{{ $n['text'] }}</p>
+                    <p class="mt-0.5 text-[11px] text-slate-400">{{ $n['time'] }}</p>
+                  </div>
+                </div>
+              @empty
+                <p class="px-4 py-6 text-center text-xs text-slate-400">Belum ada aktivitas tercatat.</p>
+              @endforelse
+            </div>
+            <button type="button" id="notif-all" class="block w-full bg-emerald-50/80 px-4 py-2.5 text-center text-xs font-bold text-emerald-700 transition hover:bg-emerald-100/80">
+              Lihat semua di Audit log
+            </button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -242,6 +270,46 @@ window.notify = notify;
 
 document.querySelectorAll('[data-action="toast"]').forEach(el => {
   el.addEventListener('click', () => notify(el.dataset.message || 'Aksi berhasil'));
+});
+
+// ── Dropdown Notifikasi (aktivitas sistem terakhir) ──
+const notifWrap  = document.getElementById('notif-wrap');
+const notifBtn   = document.getElementById('notif-btn');
+const notifPanel = document.getElementById('notif-panel');
+
+notifBtn?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  notifPanel?.toggleAttribute('hidden');
+});
+
+document.addEventListener('click', (e) => {
+  if (notifPanel && !notifPanel.hasAttribute('hidden') && !notifWrap?.contains(e.target)) {
+    notifPanel.setAttribute('hidden', '');
+  }
+});
+
+document.getElementById('notif-all')?.addEventListener('click', () => {
+  notifPanel?.setAttribute('hidden', '');
+  switchPanel('Audit log');
+});
+
+// ── Tombol navigasi antar-panel (data-action="nav") ──
+document.querySelectorAll('[data-action="nav"]').forEach(el => {
+  el.addEventListener('click', () => switchPanel(el.dataset.nav));
+});
+
+// ── Pencarian global di header: Enter -> saring daftar pengguna ──
+const globalSearch = document.getElementById('admin-global-search');
+globalSearch?.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const q = globalSearch.value.trim();
+  switchPanel('Pengguna');
+  const userSearch = document.getElementById('user-search');
+  if (userSearch) {
+    userSearch.value = q;
+    if (typeof filterUsers === 'function') filterUsers(q);
+  }
 });
 
 // â”€â”€ Admin Logout Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
