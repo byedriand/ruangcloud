@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password as PasswordBroker;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 
@@ -91,5 +92,93 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('landing');
+    }
+
+    /* ─── Reset kata sandi (REQ-F-05) ─────────────────────────────── */
+
+    public function showForgotPassword()
+    {
+        if (Auth::check()) {
+            return redirect()->route(Auth::user()->role === 'admin' ? 'admin' : 'dashboard');
+        }
+        return view('auth.forgot-password');
+    }
+
+    public function sendResetLink(Request $request)
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email'],
+        ], [
+            'email.required' => 'Alamat email wajib diisi.',
+            'email.email'    => 'Format email tidak valid.',
+        ]);
+
+        // Broker Laravel: token acak dibuat, HASH-nya disimpan di tabel
+        // password_reset_tokens, dan email berisi tautan dikirim lewat
+        // notifikasi pengguna. Status: passwords.sent / passwords.throttled.
+        $status = PasswordBroker::sendResetLink([
+            'email' => strtolower(trim($data['email'])),
+        ]);
+
+        // Tanggapan selalu sama agar tidak membocorkan email mana yang
+        // terdaftar; tautan hanya benar-benar terkirim bila email ada.
+        if ($status === 'passwords.throttled') {
+            return back()->with('status', 'Permintaan baru saja dibuat. Tunggu sekitar satu menit sebelum meminta tautan lagi.');
+        }
+
+        return back()->with('status', 'Jika email tersebut terdaftar, tautan untuk mengatur ulang kata sandi telah dikirim. Periksa kotak masuk email kamu — untuk demo lokal, email tertangkap di Mailpit (http://localhost:8025). Tautan berlaku 60 menit.');
+    }
+
+    public function showResetPassword(Request $request, string $token)
+    {
+        if (Auth::check()) {
+            return redirect()->route(Auth::user()->role === 'admin' ? 'admin' : 'dashboard');
+        }
+        return view('auth.reset-password', [
+            'token' => $token,
+            'email' => (string) $request->query('email', ''),
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $data = $request->validate([
+            'token'    => ['required'],
+            'email'    => ['required', 'email'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+        ], [
+            'token.required'     => 'Token reset tidak ditemukan. Gunakan tautan dari email.',
+            'email.required'     => 'Alamat email wajib diisi.',
+            'email.email'        => 'Format email tidak valid.',
+            'password.required'  => 'Kata sandi baru wajib diisi.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+            'password.min'       => 'Kata sandi minimal 8 karakter.',
+        ]);
+
+        // Broker memverifikasi token (cocok + belum kedaluwarsa 60 menit),
+        // menjalankan callback, lalu menghapus token (sekali pakai).
+        // Status sukses: passwords.reset.
+        $status = PasswordBroker::reset(
+            [
+                'email'                 => strtolower(trim($data['email'])),
+                'password'              => $data['password'],
+                'password_confirmation' => $request->input('password_confirmation'),
+                'token'                 => $data['token'],
+            ],
+            function (User $user, string $password) {
+                $user->forceFill(['password' => Hash::make($password)])->save();
+                $user->tokens()->delete(); // cabut token API lama demi keamanan
+                ActivityLog::record('login', Str::before($user->name, ' ') . ' mengatur ulang kata sandinya', [], $user->id);
+            }
+        );
+
+        if ($status === 'passwords.reset') {
+            return redirect()->route('login')
+                ->with('success', 'Kata sandi berhasil diatur ulang! Silakan masuk dengan kata sandi barumu.');
+        }
+
+        return back()
+            ->withErrors(['email' => 'Tautan reset tidak valid atau sudah kedaluwarsa. Silakan minta tautan baru.'])
+            ->onlyInput('email');
     }
 }

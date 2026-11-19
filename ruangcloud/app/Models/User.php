@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\ResetPasswordNotification;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -34,6 +35,12 @@ class User extends Authenticatable
     public function avatarUrl(): ?string
     {
         return $this->avatar ? route('avatars.show', ['file' => basename($this->avatar)]) : null;
+    }
+
+    /** Kirim email reset kata sandi dengan notifikasi berbahasa Indonesia. */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 
     /**

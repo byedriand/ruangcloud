@@ -39,7 +39,7 @@
 
 Sistem ini mengimplementasikan metode **Resumable Chunk Upload** (pemotongan berkas di sisi peramban klien dengan verifikasi checksum per chunk) serta **Penyimpanan Terdistribusi Multi-Node** dengan replikasi asinkron otomatis dan mekanisme failover baca dari replika yang sehat.
 
-Seluruh aplikasi kini berjalan di atas **Docker** (7 container: web, aplikasi, worker, database, dan 3 node penyimpanan) sehingga dapat dijalankan konsisten di mesin mana pun tanpa konfigurasi server manual.
+Seluruh aplikasi kini berjalan di atas **Docker** (8 service: web, aplikasi, worker, database, Redis, MinIO sebagai penyimpanan node, init bucket sekali jalan, dan Mailpit penangkap email lokal) sehingga dapat dijalankan konsisten di mesin mana pun tanpa konfigurasi server manual.
 
 ---
 
@@ -124,7 +124,7 @@ Sistem RuangCloud dirancang dengan arsitektur 4 lapisan modular (*four-tier deco
 Sistem mengimplementasikan seluruh kebutuhan fungsional modul **F-01 hingga F-09**:
 
 - **F-01: Autentikasi dan Otorisasi (RBAC)**
-  Autentikasi aman dengan *Role-Based Access Control* yang memisahkan hak akses **Administrator** dan **Pengguna**. Password ter-hash bcrypt, proteksi CSRF, indikator kekuatan kata sandi, tombol intip sandi, dan alur registrasi yang mengarahkan pengguna ke halaman login (tidak auto-login) dengan popup sukses.
+  Autentikasi aman dengan *Role-Based Access Control* yang memisahkan hak akses **Administrator** dan **Pengguna**. Password ter-hash bcrypt, proteksi CSRF, indikator kekuatan kata sandi, tombol intip sandi, dan alur registrasi yang mengarahkan pengguna ke halaman login (tidak auto-login) dengan popup sukses. Fitur **lupa kata sandi (REQ-F-05)** bekerja penuh: tautan reset dikirim lewat email (di Docker tertangkap Mailpit), token tersimpan sebagai hash, berlaku 60 menit, dan hanya dapat dipakai satu kali.
 - **F-02: Manajemen File dan Folder Lengkap**
   Folder bertingkat (*nested folders*) dengan breadcrumb, pembuatan/rename/hapus folder, pencarian cepat, pratinjau berkas, dan tempat sampah (*soft delete*). Setiap file dan folder memiliki **menu titik tiga** berisi aksi kontekstual; nama yang bentrok otomatis diberi penanda ` (1)`, ` (2)` ala Windows. File maupun folder dapat **diseret (drag & drop)** untuk dipindahkan ke folder lain atau ke breadcrumb. Kartu folder menampilkan foto/nama pemilik dan ukuran total isinya.
 - **F-03: Resumable Chunk Upload (Anti-Gagal)**
@@ -132,7 +132,7 @@ Sistem mengimplementasikan seluruh kebutuhan fungsional modul **F-01 hingga F-09
 - **F-04: Progress dan Status Real-Time**
   Baris transfer aktif menampilkan progress bar, persentase, kecepatan, estimasi sisa waktu, dan ukuran — untuk unggahan maupun unduhan.
 - **F-05: Penyimpanan Terdistribusi & Replikasi Asinkron**
-  File ditempatkan pada node primer berkapasitas bebas terbesar, lalu direplikasi asinkron oleh queue worker hingga **2 salinan fisik di node berbeda**. Unduhan dan pratinjau bersifat *self-healing*: sistem memeriksa semua replika ke disk, menyajikan dari replika yang sehat, dan memulihkan status replika yang terbukti ada.
+  File ditempatkan pada node primer berkapasitas bebas terbesar, lalu direplikasi asinkron oleh queue worker hingga **2 salinan fisik di node berbeda**. Unduhan dan pratinjau bersifat *self-healing*: sistem memeriksa semua replika pada node penyimpanan, menyajikan dari replika yang sehat, dan memulihkan status replika yang terbukti ada.
 - **F-06: Berbagi Terkontrol (Secure Share Link)**
   Tautan publik `/s/{token}` untuk **file maupun folder**, dengan kata sandi opsional dan masa berlaku **1 / 7 / 30 hari**, dapat dicabut sewaktu-waktu. Halaman publik folder menampilkan pemilik ("Dibagikan oleh"), daftar isi, unduh per file, dan unduh semua sebagai ZIP. Folder juga dapat diunduh sebagai ZIP oleh pemiliknya.
 - **Manajer Unduhan & Riwayat Satu Kali Unduh**
@@ -142,9 +142,11 @@ Sistem mengimplementasikan seluruh kebutuhan fungsional modul **F-01 hingga F-09
 - **Profil Pengguna**
   Pengguna dapat mengubah nama, email, foto profil (avatar), dan kata sandi; setiap perubahan profil tercatat di Log Aktivitas.
 - **F-08: Admin Console**
-  Satu halaman konsol dengan panel **Ringkasan, Pengguna, Penyimpanan, Unggahan, dan Audit Log**. Admin dapat melihat detail pengguna, menjadikan/mencabut peran admin (dengan penjaga admin terakhir), dan mengatur kuota per pengguna. Nama berkas pengguna ditampilkan teranonimkan pada panel admin demi privasi, dan halaman Profil admin berada di dalam konsol.
+  Satu halaman konsol dengan panel **Ringkasan, Pengguna, Penyimpanan, Unggahan, dan Audit Log**. Admin dapat melihat detail pengguna, menjadikan/mencabut peran admin (dengan penjaga admin terakhir), dan mengatur kuota per pengguna. Nama berkas pengguna ditampilkan teranonimkan pada panel admin demi privasi, dan halaman Profil admin berada di dalam konsol. Tombol **Unduh laporan / Ekspor** mengunduh laporan CSV sungguhan (sistem, penyimpanan, dan audit log), lonceng notifikasi membuka dropdown berisi aktivitas terbaru, dan pencarian di header konsol berfungsi penuh.
 - **F-09: Log Aktivitas & Jejak Audit (Audit Trail)**
   Pencatatan aksi penting sistem (login, unggah, unduh, hapus, pulihkan, bagikan, ganti nama, perubahan profil, aksi admin) lengkap dengan waktu dan identitas aktor.
+- **REST API (Token Sanctum)**
+  Endpoint JSON untuk autentikasi, file, folder, dan unggahan chunk dengan token Laravel Sanctum (`/api/login`, `/api/me`, `/api/files`, `/api/folders`, `/api/uploads`), menumpang pipeline yang sama dengan antarmuka web dan terdokumentasi di `docs/API.md`.
 
 ---
 
@@ -179,7 +181,7 @@ Sistem mengimplementasikan seluruh kebutuhan fungsional modul **F-01 hingga F-09
 ### 3. Failover Baca & Self-Healing
 - Jika node primer bermasalah, pengunduhan dan pratinjau berkas dialihkan secara transparan ke replika yang sehat (*transparent read failover*) tanpa downtime bagi pengguna.
 - Pemeriksaan replika bersifat *self-healing*: replika yang fisiknya ditemukan di disk dipulihkan statusnya menjadi `synced`, dan satu kegagalan baca tidak lagi mencap replika sebagai gagal permanen.
-- Perintah artisan `nodes:check` memeriksa kesehatan folder node dan menjadwalkan ulang replikasi yang kurang dari target.
+- Perintah artisan `nodes:check` memeriksa kesehatan bucket node di MinIO dan menjadwalkan ulang replikasi yang kurang dari target.
 
 ---
 
@@ -191,8 +193,10 @@ Sistem mengimplementasikan seluruh kebutuhan fungsional modul **F-01 hingga F-09
 | **Frontend UI** | Vanilla JS + Tailwind CSS v4 + Vite 7 | Tema kaca (glassmorphism), responsif, tanpa framework JS berat |
 | **Database** | PostgreSQL 16 | Transaksional, foreign key berindeks, encoding UTF8 |
 | **Queue / Asinkron** | Laravel Queue + Redis | Penggabungan chunk & replikasi antar node oleh worker khusus |
-| **Penyimpanan Node** | Local Storage Multi-Directory | Simulasi cluster 3 node (Jakarta, Bandung, Surabaya) |
-| **Kontainerisasi** | Docker & Docker Compose | 8 service: web (nginx), app (PHP-FPM), worker, db, redis, 3 node |
+| **Penyimpanan Node** | MinIO (S3-compatible) | Cluster 3 bucket node (jakarta, bandung, surabaya) dalam satu server MinIO |
+| **Kontainerisasi** | Docker & Docker Compose | 8 service: web (nginx), app (PHP-FPM), worker, db, redis, minio, minio-init, mailpit |
+| **CI/CD** | GitHub Actions | Build aset + suite pengujian otomatis pada setiap push ke `main` |
+| **Email Lokal** | Mailpit | Penangkap email pengembangan (tautan reset kata sandi) dengan kotak masuk web |
 | **Keamanan & Standar** | SHA-256, Bcrypt, PSR-12, OWASP | Validasi MIME, integritas hash kriptografis, proteksi CSRF |
 
 ---
@@ -222,9 +226,8 @@ Buka aplikasi di: **`http://localhost:8080`**
 | `web` | **8080** | nginx → aplikasi RuangCloud |
 | `db` | 5433 | PostgreSQL 16 (database `ruangcloud`) |
 | `redis` | 6380 | Redis 7 (antrean + cache) |
-| `node-jakarta` | 8081 | Server 1 — node penyimpanan Jakarta |
-| `node-bandung` | 8082 | Server 2 — node penyimpanan Bandung |
-| `node-surabaya` | 8083 | Server 3 — node penyimpanan Surabaya |
+| `minio` | 9000 / 9001 | MinIO: API S3 (9000) & konsol web (9001) — bucket node jakarta (Server 1), bandung (Server 2), surabaya (Server 3) |
+| `mailpit` | 8025 / 1025 | Mailpit: kotak masuk email lokal (8025) & SMTP tangkapan (1025) — tempat membaca email reset kata sandi |
 | `app` | — | PHP-FPM (internal) |
 | `worker` | — | Queue worker: perakitan chunk & replikasi |
 
@@ -293,7 +296,7 @@ Pada lingkungan Docker, awali perintah dengan `docker compose exec app`.
    ```bash
    php artisan nodes:check
    ```
-   *Memeriksa ketersediaan folder node, memperbarui status kesehatan, dan menjadwalkan ulang replikasi yang kurang dari target atau sempat gagal.*
+   *Memeriksa ketersediaan bucket node di MinIO, memperbarui status kesehatan, dan menjadwalkan ulang replikasi yang kurang dari target atau sempat gagal.*
 2. **Pembersihan Chunk Kedaluwarsa (Garbage Collection)**:
    ```bash
    php artisan uploads:cleanup
@@ -321,11 +324,11 @@ byedriand/ruangcloud/ (Root Repositori GitHub)
     ├── docker/                # Konfigurasi nginx & php.ini untuk Docker
     ├── public/                # Web root (index.php, aset terpublikasi)
     ├── resources/             # Blade views, Tailwind CSS, JavaScript (uploader/downloader)
-    ├── routes/                # Definisi rute (web.php)
-    ├── storage/               # Chunk sementara & folder node cluster (app/nodes/*)
+    ├── routes/                # Definisi rute (web.php & api.php)
+    ├── storage/               # Chunk sementara & file temporer (penyimpanan node di MinIO)
     ├── tests/                 # Pengujian otomatis (Unit & Feature)
     ├── Dockerfile             # Image multi-stage (build aset + PHP-FPM)
-    ├── docker-compose.yml     # 7 service: web, app, worker, db, node-jakarta/bandung/surabaya
+    ├── docker-compose.yml     # 8 service: web, app, worker, db, redis, minio, minio-init, mailpit
     ├── DOCKER.md              # Panduan menjalankan dengan Docker
     ├── artisan                # CLI runner Laravel
     ├── composer.json          # Dependensi backend PHP
@@ -341,6 +344,7 @@ Sesuai **Bagian VIII USTEK**, sistem disiapkan untuk melalui serangkaian penguji
 
 | Jenis Pengujian | Skenario Uji | Kriteria Kelulusan | Metode Pelaksanaan |
 |:---|:---|:---|:---|
+| **Automated Testing (CI)** | Suite PHPUnit (Unit & Feature): autentikasi & RBAC, REST API, laporan CSV admin, dan reset kata sandi. | 27 pengujian lulus; pipeline GitHub Actions hijau pada setiap push. | `php artisan test` & GitHub Actions |
 | **Functional Testing** | Eksekusi seluruh fitur modul F-01 s.d. F-09. | Seluruh fitur kritikal berjalan 100% tanpa galat. | Pengujian terstruktur per modul & pengujian integrasi endpoint API. |
 | **Resume Testing** | Unggah file besar, putuskan koneksi di tengah jalan, lanjutkan kembali. | Lanjut dari chunk terakhir tanpa mengulang dari awal; file hasil utuh. | Simulasi interupsi jaringan di berbagai titik persentase, verifikasi SHA-256. |
 | **Load Testing** | Pengujian beban multi-unggahan bersamaan. | Tetap stabil pada minimal 100 pengguna aktif simultan. | Pengujian simulasi bertahap pada antrean dan server. |

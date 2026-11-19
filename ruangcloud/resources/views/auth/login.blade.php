@@ -123,7 +123,7 @@
 
         <div class="flex items-center justify-between text-xs">
           <label class="flex items-center gap-2 font-semibold text-[#5b6d67]"><input type="checkbox" name="remember" checked class="h-4 w-4 rounded accent-emerald-500"> Ingat saya</label>
-          <button type="button" class="font-bold text-[#078d6d] hover:underline">Lupa kata sandi?</button>
+          <a href="{{ route('password.request') }}" class="font-bold text-[#078d6d] hover:underline">Lupa kata sandi?</a>
         </div>
 
         <button type="submit" class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-sm font-extrabold text-white shadow-[0_16px_35px_rgba(16,185,129,.35)] transition hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0">Masuk sebagai <span id="submit-label">Pengguna</span> <x-icon name="chevron" class="h-4 w-4" /></button>

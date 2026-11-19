@@ -284,6 +284,261 @@ html {
   }
 }
 
+/* ── Polesan premium landing (2026-11-19) ─────────────────────── */
+.landing-grid-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(to right, rgb(7 141 109 / 5%) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(7 141 109 / 5%) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 62% at 50% 0%, black 25%, transparent 74%);
+  mask-image: radial-gradient(ellipse 90% 62% at 50% 0%, black 25%, transparent 74%);
+  pointer-events: none;
+}
+
+.landing-header {
+  box-shadow: 0 1px 0 rgb(12 180 140 / 10%), 0 16px 36px -24px rgb(18 60 47 / 28%);
+}
+
+.grad-text-landing {
+  background: linear-gradient(92deg, #059669 0%, #0cb48c 45%, #14b8a6 80%, #06b6d4 115%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.stat-value-grad {
+  background: linear-gradient(92deg, #0a7a5c, #0cb48c 55%, #0e9f8a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.feature-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-130%) skewX(-12deg);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 45%), transparent);
+  transition: transform 0.9s ease;
+  pointer-events: none;
+}
+
+.feature-card:hover::after {
+  transform: translateX(130%) skewX(-12deg);
+}
+
+.landing-cta {
+  background:
+    radial-gradient(720px 420px at 12% -10%, rgb(52 211 153 / 22%), transparent 60%),
+    radial-gradient(760px 460px at 95% 10%, rgb(45 212 191 / 18%), transparent 60%),
+    linear-gradient(135deg, #0c2b23, #124534 55%, #083f30);
+}
+
+/* ── Seksi Tim: kaca gelap premium ────────────────────────────── */
+.landing-grid-bg-dark {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 4%) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 4%) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 20%, transparent 75%);
+  pointer-events: none;
+}
+
+.team-card {
+  overflow: visible;
+  background: linear-gradient(160deg, rgb(255 255 255 / 7%), rgb(255 255 255 / 3%));
+  border: 1px solid rgb(255 255 255 / 10%);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%);
+  transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.team-card::before {
+  content: "";
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(84 219 185 / 55%), transparent);
+}
+
+.team-card:hover {
+  border-color: rgb(84 219 185 / 45%);
+  box-shadow: 0 24px 50px -18px rgb(0 0 0 / 55%), 0 0 44px -10px rgb(12 180 140 / 35%), inset 0 1px 0 rgb(255 255 255 / 10%);
+}
+
+.team-avatar {
+  position: relative;
+  box-shadow: 0 14px 30px -10px rgb(0 0 0 / 50%), inset 0 1px 0 rgb(255 255 255 / 35%);
+}
+
+.team-avatar::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  pointer-events: none;
+}
+
+/* Kilau sapuan dimatikan di kartu tim agar stiker pojok bisa menyembul keluar */
+.team-card.feature-card::after {
+  display: none;
+}
+
+/* ── Karakter kartun animasi (seksi Tim) ──────────────────────── */
+.char-peek {
+  position: absolute;
+  top: -26px;
+  right: 12px;
+  width: 64px;
+  height: 64px;
+  z-index: 5;
+  filter: drop-shadow(0 10px 16px rgb(0 0 0 / 35%));
+  animation: char-bob 3.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.char-peek svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-5deg);
+}
+
+.char-peek-left {
+  right: auto;
+  left: 12px;
+}
+
+.char-peek-left svg {
+  transform: rotate(5deg);
+}
+
+/* Kartu tim melayang pelan bergelombang (mendukung tata letak zigzag) */
+.team-float {
+  animation: team-float 6s ease-in-out infinite;
+}
+
+@keyframes team-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+.char-bob {
+  animation: char-bob 3.4s ease-in-out infinite;
+}
+
+.char-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: char-blink 4.6s infinite;
+}
+
+.char-sway {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: char-sway 3.8s ease-in-out infinite;
+}
+
+@keyframes char-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2.5px);
+  }
+}
+
+@keyframes char-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.08);
+  }
+}
+
+@keyframes char-sway {
+  0%,
+  100% {
+    transform: rotate(1.6deg);
+  }
+  50% {
+    transform: rotate(-1.6deg);
+  }
+}
+
+.char-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: char-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes char-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.75;
+  }
+}
+
+.char-wifi {
+  animation: char-wifi 2.4s ease-in-out infinite;
+}
+
+@keyframes char-wifi {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── Diagram node: garis aliran beranimasi + teks gradasi indigo ─ */
+.grad-text-indigo {
+  background: linear-gradient(92deg, #6366f1, #8b5cf6 55%, #06b6d4 115%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.flow-line {
+  animation: flow-dash 1.1s linear infinite;
+}
+
+@keyframes flow-dash {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
